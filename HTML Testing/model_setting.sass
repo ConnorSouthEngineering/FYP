@@ -1,0 +1,228 @@
+$font-stack: sans-serif, Arial
+// Standard colours
+$back-colour: #60526F
+$box-colour: #D7C36B
+$alt-colour: #BA7489
+$dark-colour: #404040
+$light-colour: #FFFFFF
+
+// Semantic colours
+$primary-colour: #b3747c
+$info-colour: #503e66
+$success-colour: #6b9d5d
+$warning-colour: #eb8d25
+$danger-colour: #f44336
+
+body
+    font-family: $font-stack
+    background:$back-colour
+    background-image: url('image/generated_background.png') // Overlay texture
+    background-repeat: no-repeat
+    background-size: cover
+    background-blend-mode: luminosity, normal
+    margin: 0
+
+div
+    border-radius: 20px
+
+.navbar 
+    background:$box-colour
+    font-family: $font-stack
+    font-size: 24px
+    color: $alt-colour
+    width: 100%
+    height: 100px
+    flex-shrink: 0
+    display: flex
+    align-items: center
+    ul        
+        list-style: none
+        padding: 0
+        display: inline
+        li
+            font-weight: 700
+            display: inline
+    .company
+        padding-left: 80px
+        padding-right:20px
+        li
+            padding:20px
+    .home
+        padding-left: 0px 
+        padding-right: 50px
+        li
+            padding:20px
+    .options
+        padding: 50px
+        li
+            padding:20px
+    .profile
+        padding: 50px
+        li
+            padding:100px
+
+.company-logo
+  max-height: 150px // Adjust the max height as needed
+  max-width: 100% // Ensure the image scales proportionally
+
+.container 
+  display: flex
+  justify-content: center
+  margin-left:  150px
+  margin-right:  150px
+  margin-bottom: 0px
+  margin-top: 0px
+  .column 
+    display: flex
+    flex-direction: column
+    margin: 20px    
+    gap: 50px
+    &.left
+        flex: 1.5 // Takes up twice the space of .right
+        gap: 10px
+
+    &.right
+        flex: 1 // Takes up one unit of space
+        gap:10px
+    .box
+        background-color: $box-colour
+        display: flex
+        flex-direction: column
+        justify-content: center
+        align-items: flex-start
+        padding: 20px
+        padding-top: 5px
+        width: fit-content
+        &.cl
+            width: 750px
+        &.tp
+            width: 800px
+
+.profile
+    display: flex
+    flex-direction: row
+    justify-content: space-between
+    gap:120px
+    padding-top: 20px
+    padding-right: 10px
+    color: $alt-colour
+    ul
+            font-size: 24px
+            list-style-type: none  
+            li
+                padding-bottom: 15px
+            a
+                font-weight: bold
+
+.notes
+    display: flex
+    flex-direction: column
+    justify-content: left
+    padding-top: 0px
+    padding-right: 10px
+    color: $alt-colour
+    h1
+        margin-bottom: 0px  
+        margin-left: 10px
+    p
+        margin-left: 10px
+        font-size: 20px
+
+.title
+    background: $alt-colour
+    padding-left: 10px
+    padding-right: 10px
+    width: fit-content
+    align-self: center
+    h1
+        font-weight: 100
+        font-size: 24px
+        color: $light-colour
+
+.classes
+    display: flex
+    flex-direction: column
+    justify-content: flex-start
+    align-items: flex-start
+    align-self: left
+    gap: 0px
+    padding: 0px
+
+    .class 
+        height: 100px
+        color: $alt-colour
+        font-size:32px
+        width: 100%
+        display: flex
+        flex-direction: row
+        align-items: center  // Changed from 'top' to 'center'
+        margin-bottom: 0px  // Optional, for spacing between rows
+        padding-bottom: 0px
+
+        input
+            accent-color: $info-colour
+            height: 20px
+            width: 20px
+            margin-right: 10px  // Spacing between checkbox and text, adjust as needed
+
+.options-bar
+    max-height: 50px
+    width: 100% 
+    display: flex
+    justify-content: space-between 
+    align-items: center
+    font-size: 20px
+    padding: 0px
+
+    .options-group
+        color: $light-colour
+        height: 100%
+        padding-left: 20px
+        padding-right: 20px
+        gap: 20px
+        display: flex
+        flex-direction: row 
+        justify-content: left
+        align-items: center
+        &.new-profile
+            background: $info-colour
+            width: fit-content
+        &.browse-profile
+            background-color: $info-colour
+            width: fit-content     
+        img
+            width: 30px
+            height: 30px
+            
+.table
+    padding:20px
+    display: flex
+    flex-direction: row
+    gap:10px  
+    font-size: 20px
+    color: $light-colour
+    table
+        border-collapse: collapse
+        border: none
+    td
+        width: fit-content
+        height: 100px
+        text-align: center
+        color: $dark-colour
+        background:$light-colour
+        ul
+            list-style: none
+        input
+            margin: 0px
+            width: 50px
+            height: 50px
+            accent-color: $info-colour
+            
+    th
+        min-width: 200px
+        width: fit-content
+        padding:20px
+        &:nth-child(odd)
+            background:$dark-colour
+        &:nth-child(even)
+            background:$info-colour
