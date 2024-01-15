@@ -2,7 +2,7 @@
     <div class="column">
       <div class="box">
         <div class="title">
-          <h1 class="title">{{targetName}}</h1>
+          <h1 class="title">{{targetName}} Activity: {{chosenDataSet.actionName}}</h1>
         </div>
         <div class="options-bar">
           <div class="options-group new-dashboard">
@@ -14,7 +14,8 @@
             <p>Delete Dashboard</p>
           </div>
         </div>
-        <app-line-graph class="test"></app-line-graph>
+        <app-line-graph [dataSet]="chosenDataSet"></app-line-graph>
+        <app-pagination [totalItems]="dataSets.length" [itemsPerPage]="itemsPerPage" (pageChange)="onPageChange($event)"></app-pagination>
       </div>
     </div>
 </div>

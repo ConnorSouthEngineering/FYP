@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { actionDataSet } from 'src/shared/models/actionDataSet';
 
 @Component({
@@ -7,12 +7,42 @@ import { actionDataSet } from 'src/shared/models/actionDataSet';
   styleUrls: ['./report.component.sass']
 })
 export class ReportComponent {
-targetName: string = "Corridor";
-dataSets: actionDataSet[] = [
-  new actionDataSet("cooking", [new Date(2022, 2, 4),
-                              new Date(2022, 2, 5),
-                              new Date(2022, 2, 6)],
-                              [1,2,3])
-  ]
+  @Input() targetName: string = "Target";
+  @Input() dataSets: actionDataSet[] = 
+  [
+    new actionDataSet("Cooking", 
+                      [
+                        new Date(2022, 2, 4),
+                        new Date(2022, 2, 5),
+                        new Date(2022, 2, 6)
+                      ],
+                      "Count",
+                      [
+                        1,
+                        2,
+                        3
+                      ],
+                      null),
+    new actionDataSet("Cleaning", 
+                      [
+                        new Date(2022, 4, 2),
+                        new Date(2022, 4, 15),
+                        new Date(2022, 4, 20)
+                      ],
+                      "Time",
+                      [
+                        5,
+                        15,
+                        10
+                      ],
+                      "Seconds")  
+  ];
+  chosenDataSet: actionDataSet = this.dataSets[0]
+  currentPage: number = 1;
+  itemsPerPage: number = 1;
+  onPageChange(newPage: number) {
+    this.currentPage = newPage;
+    this.chosenDataSet = this.dataSets[this.currentPage-1];
+  }
 }
 
