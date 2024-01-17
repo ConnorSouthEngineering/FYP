@@ -55,7 +55,7 @@ export class LineGraphComponent {
       }
       else
       {
-        this.yLabel = this.dataSet.metricType + this.dataSet.metricUnit
+        this.yLabel = this.dataSet.metricType + " (" + this.dataSet.metricUnit + ")"
       }
 
       this.chartOption = {

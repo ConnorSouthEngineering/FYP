@@ -37,7 +37,8 @@ export class ReportComponent {
                       ],
                       "Seconds")  
   ];
-  chosenDataSet: actionDataSet = this.dataSets[0]
+  @Input() visualise: string = "line-graph";
+  chosenDataSet: actionDataSet = this.dataSets[0];
   currentPage: number = 1;
   itemsPerPage: number = 1;
   onPageChange(newPage: number) {

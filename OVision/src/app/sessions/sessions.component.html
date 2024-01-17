@@ -38,20 +38,20 @@
   <div class="table">
     <table>
       <tr>
-        <th class="tn">Target Name</th>
-        <th class="st">Status</th>
-        <th class="rt">Running Time</th>
+        <th>Target Name</th>
+        <th>Status</th>
+        <th>Running Time</th>
         <th>Model Name</th>
         <th>Start Date</th>
         <th>End Date</th>
-        <th>Stats</th>
+        <th>Report</th>
         <th>Settings</th>
       </tr>
       <tr *ngFor="let session of displayedSessions">
-        <td>{{session.targetName}}</td>
+        <td>{{session.deploymentName}}</td>
         <td>{{session.status}}</td>
         <td>{{session.runningTime}} hrs</td>
-        <td>{{session.modelName}}</td>
+        <td>{{session.modelID}}</td>
         <td>{{session.startDate.getDay()}}/{{session.startDate.getMonth()}}/{{session.startDate.getFullYear()}}</td>
         <td>{{session.endDate.getDay()}}/{{session.endDate.getMonth()}}/{{session.endDate.getFullYear()}}</td>
         <td>

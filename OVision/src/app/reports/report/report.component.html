@@ -14,8 +14,10 @@
             <p>Delete Dashboard</p>
           </div>
         </div>
+        <div *ngIf="visualise == 'line-graph'" >
         <app-line-graph [dataSet]="chosenDataSet"></app-line-graph>
         <app-pagination [totalItems]="dataSets.length" [itemsPerPage]="itemsPerPage" (pageChange)="onPageChange($event)"></app-pagination>
+        </div>
       </div>
     </div>
 </div>

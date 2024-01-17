@@ -1,1 +1,65 @@
-<p>reports works!</p>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title></title>
+  <base href="/">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+</head>
+<body>
+    <div class="container">
+      <div class="column">
+        <div class="box">
+          <div class="title">
+            <h1 class="title">Report History</h1>
+          </div>
+          <div class="options-bar">
+            <div class="options-group search">
+              <img src="assets/svg/search.svg" alt="Search">
+              <p>Search</p>
+            </div>
+            <div class="options-group filter">
+              <p>Filter</p>
+              <img src="assets/svg/filter.svg" alt="Filter">
+            </div>
+          </div>
+          <div *ngIf="deploymentSessions.length == 0; else sessionTable" >
+            <h1>No Sessions Currently Available</h1>
+          </div> 
+          <div>
+            <app-pagination [totalItems]="deploymentSessions.length" [itemsPerPage]="itemsPerPage" (pageChange)="onPageChange($event)"></app-pagination>
+          </div>
+        </div>
+      </div>
+    </div>
+</body>
+<ng-template #sessionTable>
+  <div class="table">
+    <table>
+      <tr>
+        <th>Report Name</th>
+        <th>Deployment Name</th>
+        <th>Frequency</th>
+        <th>Last Generation</th>
+        <th>Next Generation</th>
+        <th>Report</th>
+        <th>Settings</th>
+      </tr>
+      <tr *ngFor="let session of displayedSessions">
+        <td>{{session.reportName}}</td>
+        <td>{{session.deploymentID}}</td>
+        <td>{{session.frequency}} {{session.frequencyType}}</td>
+        <td>{{session.lastGen.getDay()}}/{{session.lastGen.getMonth()}}/{{session.lastGen.getFullYear()}}</td>
+        <td>{{session.nextGen.getDay()}}/{{session.nextGen.getMonth()}}/{{session.nextGen.getFullYear()}}</td>
+        <td>
+          <img src="assets/svg/analytics.svg" alt="Analytics Icon">
+        </td>
+        <td>
+          <img src="assets/svg/settings.svg" alt="Settings Icon">
+        </td>
+      </tr>
+    </table>
+  </div>
+</ng-template>
+</html>

@@ -1,24 +1,37 @@
-import { Component, EventEmitter, Input, Output, OnChanges, SimpleChanges } from '@angular/core';
-import { deploymentItem } from 'src/shared/models/deploymentItem';
+import { Component, OnInit } from '@angular/core';
+import { GetDeploymentsService } from './get-deployments.service';
+import { Deployment } from 'src/shared/models/Entities';
 
 @Component({
   selector: 'app-sessions',
   templateUrl: './sessions.component.html',
   styleUrls: ['./sessions.component.sass']
 })
-export class SessionsComponent {
-  deploymentSessions: deploymentItem[] = [
-    new deploymentItem("Corridor", "Active", 1, "IBM MIT", new Date(2022, 2, 3), new Date(2024, 2, 20), "address", "address"),
-    new deploymentItem("Reception", "Error", 3, "Toyota Activity", new Date(2022, 5, 2), new Date(2022, 6, 11), "address", "address"),
-    new deploymentItem("Kitchen", "Expiring", 2, "YOLOv8", new Date(2013, 2, 6), new Date(2024, 2, 20), "address", "address"),
-    new deploymentItem("Hall", "Active", 5, "Microsoft COCO", new Date(2010, 2, 12), new Date(2022, 1, 16), "address", "address")
-  ];
-  displayedSessions: deploymentItem[] = [];
+export class SessionsComponent implements OnInit {
+  deploymentSessions: Deployment[] = [];
+  displayedSessions: Deployment[] = [];
   currentPage: number = 1;
   itemsPerPage: number = 2;
 
+  constructor(private getDeploymentsService: GetDeploymentsService) { }
+
   ngOnInit() {
-    this.updateDisplayedSessions();
+    this.getDeploymentsService.getDeployments().subscribe({
+      next: (data: any[]) => {
+        console.log("Fetched data:", data);
+        this.deploymentSessions = data.map(item => new Deployment(
+          item[0], 
+          item[1], 
+          item[2], 
+          item[3], 
+          item[4], 
+          new Date(item[5] * 1000), 
+          new Date(item[6] * 1000)  
+        ));
+        this.updateDisplayedSessions();
+      },
+      error: (error) => console.error('Error fetching deployments:', error)
+    });
   }
 
   onPageChange(newPage: number) {
