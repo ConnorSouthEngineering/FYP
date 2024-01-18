@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, Output, OnChanges, SimpleChanges } from '@angular/core';
+import { GetReportsService } from './get-reports.service';
 import { Report } from 'src/shared/models/Entities';
 @Component({
   selector: 'app-reports',
@@ -7,18 +8,32 @@ import { Report } from 'src/shared/models/Entities';
 })
 
 export class ReportsComponent {
-  deploymentSessions: Report[] = [
-    new Report("Activity Counts", "D1234", 2, "week", new Date(2022, 2, 3), new Date(2024, 2, 20)),
-    new Report("Visiting Activity", "D324", 1, "month", new Date(2022, 5, 2), new Date(2022, 6, 11)),
-    new Report("Culnary Activity", "D554", 3, "week", new Date(2013, 2, 6), new Date(2024, 2, 20)),
-    new Report("Passage Count", "D643", 4, "day", new Date(2010, 2, 12), new Date(2022, 1, 16))
-  ];
+  deploymentSessions: Report[] = [];
   displayedSessions: Report[] = [];
   currentPage: number = 1;
   itemsPerPage: number = 2;
 
+  constructor(private getReportsService: GetReportsService) { }
+
   ngOnInit() {
-    this.updateDisplayedSessions();
+    this.getReportsService.getReports().subscribe({
+      next: (data: any[]) => {
+        console.log("Fetched data:", data);
+        this.deploymentSessions = data.map(item => new Report(
+          item[0], 
+          item[1], 
+          item[2], 
+          item[3],
+          item[4],
+          new Date(item[5] * 1000), 
+          new Date(item[6] * 1000),
+          item[7],
+          item[8]
+        ));
+        this.updateDisplayedSessions();
+      },
+      error: (error) => console.error('Error fetching deployments:', error)
+    });
   }
 
   onPageChange(newPage: number) {

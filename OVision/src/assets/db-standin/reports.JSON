@@ -1,0 +1,6 @@
+[
+    ["R1234","Activity Counts", "D1234", 2, "week", 1646265600, 1710892800,"line-graph",["Cleaning","Cooking"]],
+    ["R324","Visiting Activity", "D324", 1, "month", 1654128000, 1657497600,"bar-graph",["Mopping"]],
+    ["R554","Culnary Activity", "D554", 3, "week", 1362528000, 1710892800,"bar-graph",["Slicing","Vacuuming"]],
+    ["R643","Passage Count", "D643", 4, "day", 1268352000, 1644969600,"line-graph",["Washing"]]
+  ]

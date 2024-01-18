@@ -10,14 +10,12 @@ export class Target {
 }
 
 export class Person extends Target {
-    public id: string;
     public dob: Date;
     public role: string;
-    private age: number;
+    public age: number;
 
-    constructor(name: string, altName: string, creationDate: Date, status: 'Active' | 'Complete' | 'Expiring' | 'Error', dob: Date, role: string) {
+    constructor(public id:string, name: string, altName: string, creationDate: Date, status: 'Active' | 'Complete' | 'Expiring' | 'Error', dob: Date, role: string) {
         super(name, altName, creationDate, status);
-        this.id = 'P' + this.generateUniqueId();
         this.dob = dob;
         this.role = role;
         this.age = this.getAge(dob);
@@ -33,29 +31,20 @@ export class Person extends Target {
         return age;
     }
 
-    private generateUniqueId(): string {
+/*     private generateUniqueId(): string {
         return uuid();
-    }
+    } */
 }
 
 export class Location extends Target {
-    public id: string;
-    public access: 'public' | 'private';
-
-    constructor(name: string, altName: string, creationDate: Date, status: 'Active' | 'Complete' | 'Expiring' | 'Error', access: 'public' | 'private') {
+    constructor(public id:string, name: string, altName: string, creationDate: Date, status: 'Active' | 'Complete' | 'Expiring' | 'Error', public access: 'public' | 'private') {
         super(name, altName, creationDate, status);
-        this.id = 'L' + this.generateUniqueId();
-        this.access = access;
-    }
-
-    private generateUniqueId(): string {
-        return uuid();
     }
 }
 
 export class Deployment {
-    public id;
     constructor(
+        public id: string,
         public deploymentName: string,
         public targetID: string,
         public status: 'Active' | 'Complete' | 'Expiring' | 'Error',
@@ -63,29 +52,19 @@ export class Deployment {
         public modelID: string,
         public startDate: Date,
         public endDate: Date
-    ) {
-        this.id = 'D' + this.generateUniqueId();
-    }
-
-    private generateUniqueId(): string {
-        return uuid();
-    }
+    ){}
 }
 
 export class Report {
-    public id;
     constructor(
+        public id: string,
         public reportName: string,
         public deploymentID: string,
         public frequency: number,
         public frequencyType: string,
         public lastGen: Date,
-        public nextGen: Date
-    ) {
-        this.id = 'R' + this.generateUniqueId();
-    }
-
-    private generateUniqueId(): string {
-        return uuid();
-    }
+        public nextGen: Date,
+        public graphType: string,
+        public activitySet: Array<string>
+    ){}
 }

@@ -53,7 +53,9 @@
         <td>{{session.lastGen.getDay()}}/{{session.lastGen.getMonth()}}/{{session.lastGen.getFullYear()}}</td>
         <td>{{session.nextGen.getDay()}}/{{session.nextGen.getMonth()}}/{{session.nextGen.getFullYear()}}</td>
         <td>
-          <img src="assets/svg/analytics.svg" alt="Analytics Icon">
+          <a [routerLink]="['/report', session.id]">
+            <img src="assets/svg/analytics.svg" alt="Analytics Icon">
+          </a>
         </td>
         <td>
           <img src="assets/svg/settings.svg" alt="Settings Icon">

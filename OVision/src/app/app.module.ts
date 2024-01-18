@@ -13,6 +13,7 @@ import { HomeComponent } from './home/home.component';
 import { ReportComponent } from './reports/report/report.component';
 import { ReportsComponent } from './reports/reports.component';
 import { LineGraphComponent } from './reports/graphs/line-graph/line-graph.component';
+import { BarGraphComponent } from './reports/graphs/bar-graph/bar-graph.component';
 
 @NgModule({
   declarations: [
@@ -23,7 +24,8 @@ import { LineGraphComponent } from './reports/graphs/line-graph/line-graph.compo
     HomeComponent,
     ReportComponent,
     ReportsComponent,
-    LineGraphComponent
+    LineGraphComponent,
+    BarGraphComponent
   ],
   imports: [
     BrowserModule,

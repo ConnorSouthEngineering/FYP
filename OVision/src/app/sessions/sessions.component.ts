@@ -23,10 +23,11 @@ export class SessionsComponent implements OnInit {
           item[0], 
           item[1], 
           item[2], 
-          item[3], 
-          item[4], 
-          new Date(item[5] * 1000), 
-          new Date(item[6] * 1000)  
+          item[3],
+          item[4],
+          item[5],
+          new Date(item[6] * 1000), 
+          new Date(item[7] * 1000)   
         ));
         this.updateDisplayedSessions();
       },

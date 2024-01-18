@@ -11,7 +11,7 @@ const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'home', component: HomeComponent },
   { path: 'reports', component: ReportsComponent },
-  { path: 'report', component: ReportComponent },
+  { path: 'report/:reportID', component: ReportComponent },
   { path: 'linegraph', component: LineGraphComponent }
 ];
 
