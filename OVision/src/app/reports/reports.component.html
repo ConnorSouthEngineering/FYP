@@ -47,13 +47,13 @@
         <th>Settings</th>
       </tr>
       <tr *ngFor="let session of displayedSessions">
-        <td>{{session.reportName}}</td>
-        <td>{{session.deploymentID}}</td>
-        <td>{{session.frequency}} {{session.frequencyType}}</td>
-        <td>{{session.lastGen.getDay()}}/{{session.lastGen.getMonth()}}/{{session.lastGen.getFullYear()}}</td>
-        <td>{{session.nextGen.getDay()}}/{{session.nextGen.getMonth()}}/{{session.nextGen.getFullYear()}}</td>
+        <td>{{session.report_name}}</td>
+        <td>{{session.deployment_id}}</td>
+        <td>{{session.frequency}} {{session.frequency_type}}</td>
+        <td>{{session.last_gen.getDay()}}/{{session.last_gen.getMonth()}}/{{session.last_gen.getFullYear()}}</td>
+        <td>{{session.next_gen.getDay()}}/{{session.next_gen.getMonth()}}/{{session.next_gen.getFullYear()}}</td>
         <td>
-          <a [routerLink]="['/report', session.id]">
+          <a [routerLink]="['/report', session.report_id]">
             <img src="assets/svg/analytics.svg" alt="Analytics Icon">
           </a>
         </td>

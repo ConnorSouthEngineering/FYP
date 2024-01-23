@@ -48,12 +48,12 @@
         <th>Settings</th>
       </tr>
       <tr *ngFor="let session of displayedSessions">
-        <td>{{session.deploymentName}}</td>
-        <td>{{session.status}}</td>
-        <td>{{session.runningTime}} hrs</td>
-        <td>{{session.modelID}}</td>
-        <td>{{session.startDate.getDay()}}/{{session.startDate.getMonth()}}/{{session.startDate.getFullYear()}}</td>
-        <td>{{session.endDate.getDay()}}/{{session.endDate.getMonth()}}/{{session.endDate.getFullYear()}}</td>
+        <td>{{session.deployment_name}}</td>
+        <td>{{session.status_value}}</td>
+        <td>{{session.running_time}} hrs</td>
+        <td>{{session.model_id}}</td>
+        <td>{{session.start_date.getDay()}}/{{session.start_date.getMonth()}}/{{session.start_date.getFullYear()}}</td>
+        <td>{{session.end_date.getDay()}}/{{session.end_date.getMonth()}}/{{session.end_date.getFullYear()}}</td>
         <td>
           <img src="assets/svg/analytics.svg" alt="Analytics Icon">
         </td>

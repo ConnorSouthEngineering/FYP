@@ -2,10 +2,10 @@ import {v4 as uuid} from 'uuid';
 
 export class Target {
     constructor(
-        public name: string,
-        public altName: string,
-        public creationDate: Date,
-        public status: 'Active' | 'Complete' | 'Expiring' | 'Error',
+        public target_name: string,
+        public alt_name: string,
+        public creation_date: Date,
+        public status_value: 'Active' | 'Complete' | 'Expiring' | 'Error',
     ) {}
 }
 
@@ -14,8 +14,16 @@ export class Person extends Target {
     public role: string;
     public age: number;
 
-    constructor(public id:string, name: string, altName: string, creationDate: Date, status: 'Active' | 'Complete' | 'Expiring' | 'Error', dob: Date, role: string) {
-        super(name, altName, creationDate, status);
+    constructor(
+        public target_id:string, 
+        target_name: string, 
+        alt_name: string, 
+        creation_date: Date, 
+        status_value: 'Active' | 'Complete' | 'Expiring' | 'Error', 
+        dob: Date, 
+        role: string) 
+        {
+        super(target_name, alt_name, creation_date, status_value);
         this.dob = dob;
         this.role = role;
         this.age = this.getAge(dob);
@@ -37,34 +45,41 @@ export class Person extends Target {
 }
 
 export class Location extends Target {
-    constructor(public id:string, name: string, altName: string, creationDate: Date, status: 'Active' | 'Complete' | 'Expiring' | 'Error', public access: 'public' | 'private') {
-        super(name, altName, creationDate, status);
+    constructor(
+        public target_id:string,
+        target_name: string,
+        alt_name: string,
+        creation_date: Date,
+        status_value: 'Active' | 'Complete' | 'Expiring' | 'Error',
+        public access: 'public' | 'private') 
+        {
+        super(target_name, alt_name, creation_date, status_value);
     }
 }
 
 export class Deployment {
     constructor(
-        public id: string,
-        public deploymentName: string,
-        public targetID: string,
-        public status: 'Active' | 'Complete' | 'Expiring' | 'Error',
-        public runningTime: number,
-        public modelID: string,
-        public startDate: Date,
-        public endDate: Date
+        public deployment_id: string,
+        public deployment_name: string,
+        public target_id: string,
+        public status_value: 'Active' | 'Complete' | 'Expiring' | 'Error',
+        public running_time: number,
+        public model_id: string,
+        public start_date: Date,
+        public end_date: Date
     ){}
 }
 
 export class Report {
     constructor(
-        public id: string,
-        public reportName: string,
-        public deploymentID: string,
+        public report_id: string,
+        public report_name: string,
+        public deployment_id: string,
         public frequency: number,
-        public frequencyType: string,
-        public lastGen: Date,
-        public nextGen: Date,
-        public graphType: string,
-        public activitySet: Array<string>
+        public frequency_type: string,
+        public last_gen: Date,
+        public next_gen: Date,
+        public graph_type: string,
+        public activity_set: Array<string>
     ){}
 }
