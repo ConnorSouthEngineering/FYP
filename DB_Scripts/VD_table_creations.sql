@@ -1,4 +1,4 @@
-SET SCHEMA 'vision_data_handling';
+SET SCHEMA 'vision_data';
 
 BEGIN;
 CREATE TABLE Targets(
@@ -85,4 +85,15 @@ CREATE TABLE Reports(
     graph_id INT REFERENCES Graph_Map(graph_id) NOT NULL,
     class_list_id INT REFERENCES Class_lists(class_list_id) NOT NULL
 );
+
+CREATE TABLE Data_TotalEntry(
+    entry_num INT NOT NULL,
+    deployment_id INT NOT NULL,
+    action_name VARCHAR NOT NULL, 
+    creation_date DATE NOT NULL,
+    result INT NOT NULL,
+    unit VARCHAR
+)
+PARTITION BY RANGE (creation_date);
+
 END;
