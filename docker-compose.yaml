@@ -1,0 +1,22 @@
+version: '3.3'
+services:
+  db:
+    build:
+      context: ./PostGres
+    environment:
+      POSTGRES_USER: dbADMIN
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: ovision
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+  web:
+    build:
+      context: ./OVision
+    ports:
+      - "4200:4200"
+    volumes:
+      - ./OVision:/app
+      - /app/node_modules
+
+volumes:
+  postgres_data:

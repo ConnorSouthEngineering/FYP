@@ -45,3 +45,7 @@ sudo systemctl restart postgresql
 PSQL
 \c test_db
 GRANT USAGE ON SCHEMA cron TO postgres;
+
+
+<!--DOCKER PSQL ACCESS-->
+psql --username=[username] --dbname=[dbname] --password
