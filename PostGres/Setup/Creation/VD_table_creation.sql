@@ -1,6 +1,9 @@
 SET SCHEMA 'vision_data';
 
 BEGIN;
+
+CREATE TYPE FREQUENCY_UNIT AS ENUM ('day','week','month','year');
+
 CREATE TABLE Targets(
     target_id INT PRIMARY KEY NOT NULL,
     target_name VARCHAR NOT NULL,
@@ -23,35 +26,39 @@ CREATE TABLE Sources(
     license_expiry_date DATE
 );
 
-CREATE TABLE Source_lists(
-    source_list_id INT PRIMARY KEY NOT NULL,
-    source_id INT REFERENCES Sources(source_id) NOT NULL
-);
-
 CREATE TABLE Classes(
     class_id INT PRIMARY KEY NOT NULL,
     class_name VARCHAR NOT NULL,
-    loc VARCHAR NOT NULL,
-    data_count INT NOT NULL,
-    source_list_id INT REFERENCES Source_lists(source_list_id) NOT NULL
+    data_count INT NOT NULL
 );
 
-CREATE TABLE Class_lists(
-    class_list_id INT PRIMARY KEY NOT NULL,
-    class_id INT REFERENCES Classes(class_id)
+CREATE TABLE ClassSources(
+    class_source_id INT PRIMARY KEY NOT NULL,
+    class_id INT REFERENCES Classes(class_id) NOT NULL,
+    source_id INT REFERENCES Sources(source_id) NOT NULL
 );
 
 CREATE TABLE Categories(
     category_id INT PRIMARY KEY NOT NULL,
-    category_name VARCHAR,
-    class_list_id INT REFERENCES Class_lists(class_list_id) NOT NULL
+    category_name VARCHAR
+);
+
+CREATE TABLE ClassCategories(
+    class_category_id INT PRIMARY KEY NOT NULL,
+    class_id INT REFERENCES Classes(class_id),
+    category_id INT REFERENCES Categories(category_id)
 );
 
 CREATE TABLE Models(
     model_id INT PRIMARY KEY NOT NULL,
     model_name VARCHAR NOT NULL,
-    creation_date DATE NOT NULL,
-    class_list_id INT REFERENCES Class_lists(class_list_id) NOT NULL
+    creation_date DATE NOT NULL
+);
+
+CREATE TABLE ModelClasses(
+    model_class_id INT PRIMARY KEY NOT NULL,
+    model_id INT REFERENCES Models(model_id),
+    class_id INT REFERENCES Classes(class_id)
 );
 
 CREATE TABLE Deployments(
@@ -65,12 +72,7 @@ CREATE TABLE Deployments(
     expiry_date DATE NOT NULL
 );
 
-CREATE TABLE Frequency_Map(
-    frequency_id INT PRIMARY KEY NOT NULL,
-    frequency_type VARCHAR NOT NULL
-);
-
-CREATE TABLE Graph_Map(
+CREATE TABLE GraphMap(
     graph_id INT PRIMARY KEY NOT NULL,
     graph_type VARCHAR NOT NULL
 );
@@ -79,17 +81,22 @@ CREATE TABLE Reports(
     report_id INT PRIMARY KEY NOT NULL,
     report_name VARCHAR NOT NULL,
     deployment_id INT REFERENCES Deployments(deployment_id)  NOT NULL,
-    frequency INT NOT NULL,
-    frequency_id INT REFERENCES Frequency_Map(frequency_id) NOT NULL,
-    last_gen DATE NOT NULL,
-    graph_id INT REFERENCES Graph_Map(graph_id) NOT NULL,
-    class_list_id INT REFERENCES Class_lists(class_list_id) NOT NULL
+    frequency_value DECIMAL(4,2) NOT NULL,
+    frequency_unit FREQUENCY_UNIT NOT NULL,
+    last_gen DATE,
+    graph_id INT REFERENCES GraphMap(graph_id) NOT NULL
 );
 
-CREATE TABLE Data_TotalEntry(
+CREATE TABLE ReportClasses(
+    report_class_id INT PRIMARY KEY NOT NULL,
+    class_id INT REFERENCES Classes(class_id),
+    report_id INT REFERENCES Reports(report_id)
+);
+
+CREATE TABLE DataTotalEntry(
     entry_num INT NOT NULL,
     deployment_id INT NOT NULL,
-    action_name VARCHAR NOT NULL, 
+    class_id INT NOT NULL REFERENCES Classes(class_id), 
     creation_date DATE NOT NULL,
     result INT NOT NULL,
     unit VARCHAR

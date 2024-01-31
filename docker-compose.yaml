@@ -4,7 +4,7 @@ services:
     build:
       context: ./PostGres
     environment:
-      POSTGRES_USER: dbADMIN
+      POSTGRES_USER: dbadmin
       POSTGRES_PASSWORD: password
       POSTGRES_DB: ovision
     volumes:
