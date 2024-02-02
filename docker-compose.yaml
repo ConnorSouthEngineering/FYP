@@ -7,6 +7,8 @@ services:
       POSTGRES_USER: dbadmin
       POSTGRES_PASSWORD: password
       POSTGRES_DB: ovision
+    ports:
+      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
   web:
@@ -17,6 +19,11 @@ services:
     volumes:
       - ./OVision:/app
       - /app/node_modules
+  api:
+    build: 
+      context: ./VisionLinkAPI
+    ports:
+     - "3000:3000"
 
 volumes:
   postgres_data:
