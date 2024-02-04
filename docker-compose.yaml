@@ -11,6 +11,8 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
   web:
     build:
       context: ./OVision
@@ -24,6 +26,9 @@ services:
       context: ./VisionLinkAPI
     ports:
      - "3000:3000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
 volumes:
   postgres_data:
+

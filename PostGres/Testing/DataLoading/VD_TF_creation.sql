@@ -1,0 +1,9 @@
+SET SCHEMA 'vision_data';
+CREATE OR REPLACE FUNCTION test_f()
+RETURNS VARCHAR
+LANGUAGE plpgsql
+AS $$
+BEGIN
+  RETURN 'test works'; 
+END;
+$$;

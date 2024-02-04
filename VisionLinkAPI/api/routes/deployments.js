@@ -1,9 +1,38 @@
 const express = require('express');
 const router = express.Router();
 
+const executeSP = require('../execute_SP.js');
+const executeF = require('../execute_F.js');
+
 router.get('/',(req,res,next)=>{
     res.status(200).json({  
         message: "Handling requests for /deployments"
+    });
+})
+
+router.get('/SP',(req,res,next)=>{
+    const sp_name = "test_sp";
+    const sc_name = "vision_data";
+    const params = [];
+    executeSP(sc_name,sp_name, params)
+    .then(result => {
+        res.status(200).json(result);
+    })
+    .catch(err => {
+        res.status(500).json({error: err});
+    });
+})
+
+router.get('/F',(req,res,next)=>{
+    const f_name = "test_f";
+    const sc_name = "vision_data";
+    const params = [];
+    executeF(sc_name,f_name, params)
+    .then(result => {
+        res.status(200).json(result);
+    })
+    .catch(err => {
+        res.status(500).json({error: err});
     });
 })
 

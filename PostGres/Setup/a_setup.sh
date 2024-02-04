@@ -5,6 +5,12 @@ echo "shared_preload_libraries = 'pg_cron'" >> /var/lib/postgresql/data/postgres
 echo "cron.database_name = '"$POSTGRES_DB"'" >> /var/lib/postgresql/data/postgresql.conf
 ##Restart psql
 pg_ctl restart
+##Add docker subnet to pg_hba.conf
+# DOCKER_SUBNET="172.17.0.0/16"
+# PG_HBA_PATH="/var/lib/postgresql/data/pg_hba.conf"
+# cp "$PG_HBA_PATH" "$PG_HBA_PATH.bak"
+# echo "host    all             all             $DOCKER_SUBNET            md5" >> "$PG_HBA_PATH"
+# pg_ctl restart
 ##Execute schema setup
 psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -f /docker-entrypoint-initdb.d/Creation/VD_schema_creation.sql
 ##Execute table setup
