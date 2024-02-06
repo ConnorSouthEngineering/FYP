@@ -1,6 +1,6 @@
 FROM node:lts-bookworm as node
 WORKDIR /app
 COPY package*.json ./
-COPY . ./
+COPY ./dist ./
 RUN npm install
-CMD ["npm", "start"]
+CMD ["node", "."]
