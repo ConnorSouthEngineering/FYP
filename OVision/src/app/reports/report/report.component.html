@@ -2,9 +2,9 @@
     <div class="column">
       <div class="box">
         <div class="title">
-          <h1 class="title">{{reportName}} {{this.pageTitle}}</h1>
+          <h1 class="title">{{reportName}}</h1><h1 class="title">{{this.pageTitle}}</h1>
         </div>
-        <div class="options-bar">
+<!--         <div class="options-bar">
           <div class="options-group new-dashboard">
             <img src="../../assets/svg/add.svg" alt="Add">
             <p>New Dashboard</p>
@@ -13,12 +13,12 @@
             <img src="../../assets/svg/delete.svg" alt="Delete">
             <p>Delete Dashboard</p>
           </div>
-        </div>
-        <div *ngIf="visualise == 'line-graph'" class="graph">
+        </div> -->
+        <div *ngIf="visualise == 'line'" class="graph">
         <app-line-graph [dataSet]="chosenDataSet" ></app-line-graph>
         <app-pagination [totalItems]="dataSets.length" [itemsPerPage]="itemsPerPage" (pageChange)="onPageChange($event)" class="page"></app-pagination>
         </div>
-        <div *ngIf="visualise == 'bar-graph'" class="graph">
+        <div *ngIf="visualise == 'bar'" class="graph">
           <app-bar-graph [dataSets]="dataSets" ></app-bar-graph>
           </div>
       </div>

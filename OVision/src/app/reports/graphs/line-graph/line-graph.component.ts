@@ -8,11 +8,11 @@ import { TimeSet, CountSet } from 'src/shared/models/DataStructures';
 })
 export class LineGraphComponent {
   @Input() dataSet: CountSet | TimeSet = 
-    new CountSet("Cooking", 
+  new CountSet(1, 
     [
-      1651449600,
-      1652572800,
-      1646524800
+      "2024-03-25",
+      "2024-03-26",
+      "2024-03-27"
     ],
     [
       1,
@@ -45,12 +45,9 @@ export class LineGraphComponent {
 
     private updateChart(): void {
       console.log(this.dataSet)
-      const formattedDates = this.dataSet.dateValues.map(date => 
-        `${(new Date(date*1000)).getDate()}/${(new Date(date*1000)).getMonth() + 1}` 
-      );
       
       if(this.dataSet instanceof TimeSet){
-        this.yLabel = "Time (" + this.dataSet.timeUnit + ")"
+        this.yLabel = "Time (" + this.dataSet.metric + ")"
       }
       else
       {
@@ -64,7 +61,7 @@ export class LineGraphComponent {
         },
         xAxis: {
           type: 'category',
-          data: formattedDates,
+          data: this.dataSet.dateValues,
           name: "Dates",
           nameLocation: 'middle',
           nameTextStyle: {color: '#BA7489', fontSize: '20', fontWeight: 'bold', verticalAlign: 'bottom',padding: [0,0,-30,0]},

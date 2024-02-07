@@ -1,28 +1,28 @@
 export class DataSet 
 {
   constructor(
-    public actionName: string,
-    public dateValues: Array<number>,
+    public classid: number,
+    public dateValues: Array<string>,
     public values: Array<number>
               ) {}
 }
 export class CountSet extends DataSet 
 {
   constructor(
-    actionName: string,
-    dateValues: Array<number>,
+    classid: number,
+    dateValues: Array<string>,
     values: Array<number>
     ){
-    super(actionName,dateValues, values)
+    super(classid,dateValues, values)
     }
 }
 export class TimeSet extends DataSet 
 {
   constructor(
-    actionName: string,
-    dateValues: Array<number>,
+    classid: number,
+    dateValues: Array<string>,
     values: Array<number>,
-    public timeUnit: string){
-    super(actionName,dateValues, values)
+    public metric: string){
+    super(classid,dateValues, values)
   }
 }

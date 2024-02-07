@@ -1,4 +1,5 @@
 import { Component} from '@angular/core'
+import { GetMapService } from './passive/get-maps.service';
 
 @Component({
   selector: 'app-root',
@@ -8,4 +9,5 @@ import { Component} from '@angular/core'
 
 export class AppComponent{
   title = 'OVision';
+  constructor(private mapService: GetMapService) {  }
 }

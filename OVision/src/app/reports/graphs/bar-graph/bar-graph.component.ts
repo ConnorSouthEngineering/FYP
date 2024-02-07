@@ -1,6 +1,7 @@
 import { Component, Input, SimpleChanges } from '@angular/core';
 import { EChartsOption } from 'echarts';
 import { CountSet, TimeSet } from 'src/shared/models/DataStructures';
+import { GetMapService } from '../../../passive/get-maps.service';
 
 @Component({
   selector: 'app-bar-graph',
@@ -10,28 +11,28 @@ import { CountSet, TimeSet } from 'src/shared/models/DataStructures';
 
 export class BarGraphComponent {
   @Input() dataSets: CountSet[] | TimeSet[] = 
-    [new CountSet("Cooking", 
-    [
-      1651449600,
-      1652572800,
-      1646524800
-    ],
-    [
-      1,
-      2,
-      3
-    ]),
-    new CountSet("Cooking", 
-    [
-      1651449600,
-      1652572800,
-      1646524800
-    ],
-    [
-      1,
-      2,
-      3
-    ])
+    [new CountSet(1, 
+      [
+        "2024-03-25",
+        "2024-03-26",
+        "2024-03-27"
+      ],
+      [
+        1,
+        2,
+        3
+      ]),
+      new CountSet(1, 
+        [
+          "2024-03-25",
+          "2024-03-26",
+          "2024-03-27"
+        ],
+        [
+          1,
+          2,
+          3
+        ])
   ];
   avgValues: Array<number> = [];
   activityNames: Array<string> = [];
@@ -58,23 +59,46 @@ export class BarGraphComponent {
       }
     }
 
-    private updateChart(): void {
-      this.avgValues = [];
-      this.activityNames = [];
+    constructor(private mapService: GetMapService) { }
+
+    
+    getClassName() {
+      this.mapService.fetchClassMap().subscribe(classMaps => {
+        const classMap = classMaps[0]?.get_class_map;
+        console.log(classMap);
+        if (classMap) {
+          this.activityNames = this.dataSets.map(dataSet => {
+            const className = classMap[dataSet.classid];
+            if (className) {
+              return className.charAt(0).toUpperCase() + className.slice(1);
+            } else {
+              console.log('Class name not found for ID:', dataSet.classid);
+              return "Fetch Error";
+            }
+          });
+        }})}
+
+    getAverage()
+    {
       this.dataSets.forEach( (element) => {
-        this.activityNames.push(element.actionName);
+        this.activityNames.push(element.classid.toString());
         let total = element.values.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
         this.avgValues.push((total/element.values.length));
       })
+    }
 
+    private updateChart(): void {
+      this.avgValues = [];
+      this.activityNames = [];
+      this.getAverage();
+      this.getClassName();
       if(this.dataSets[0] instanceof TimeSet){
-        this.yLabel = "Time (" + this.dataSets[0].timeUnit + ")"
+        this.yLabel = "Time (" + this.dataSets[0].metric + ")"
       }
       else
       {
         this.yLabel = "Count"
       }
-
       this.chartOption = {
         grid:{
           backgroundColor: 'white',
