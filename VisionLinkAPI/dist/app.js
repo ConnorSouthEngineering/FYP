@@ -2,23 +2,16 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const express = require('express');
 const bodyParser = require('body-parser');
+const cors = require('cors');
 const app = express();
+app.use(cors({
+    origin: 'http://localhost:4200'
+}));
 const deploymentRoutes = require('./api/routes/deployments');
 const targetRoutes = require('./api/routes/targets');
 const reportRoutes = require('./api/routes/reports');
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-/* app.use((req, res, next) => {
-    res.header("access-control-allow-origin", "*");
-    res.header(
-        "access-control-allow-headers",
-        "Origin, X-Requested-With, Content-Type, Accept, Authorization"
-    );
-    if (req.method === 'OPTIONS') {
-        res.header('access-control-allow-methods', 'POST, PUT, PATCH, DELETE');
-        return res.status(200).json({});
-    }
-}); */
 app.use('/reports', reportRoutes);
 app.use('/targets', targetRoutes);
 app.use('/deployments', deploymentRoutes);

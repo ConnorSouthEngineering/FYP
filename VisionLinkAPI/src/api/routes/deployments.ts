@@ -1,12 +1,30 @@
 const express = require('express');
 const router = express.Router();
-
 const executeSP = require('../execute_SP.js');
-const executeF = require('../execute_F.js');
+const executeF= require('../execute_F.js');
 
 router.get('/',(req,res,next)=>{
-    res.status(200).json({  
-        message: "Handling requests for /deployments"
+    const _item_limit = parseInt(req.query.itemLimit, 10) || 10; 
+    const _current_page = parseInt(req.query.currentPage, 10) || 1;
+    const params = [_item_limit,_current_page];
+    executeF("vision_data","get_latest_deployments", params)
+    .then(result => {
+        res.status(200).json(result);
+    })
+    .catch(err => {
+        res.status(500).json({error: err});
+    });
+})
+
+router.get('/:_deployment_id',(req,res,next)=>{
+    const _deployment_id = req.params._deployment_id;
+    const params = [_deployment_id];
+    executeF("vision_data","get_deployment", params)
+    .then(result => {
+        res.status(200).json(result);
+    })
+    .catch(err => {
+        res.status(500).json({error: err});
     });
 })
 
@@ -20,44 +38,6 @@ router.get('/SP',(req,res,next)=>{
     })
     .catch(err => {
         res.status(500).json({error: err});
-    });
-})
-
-router.get('/F',(req,res,next)=>{
-    const f_name = "test_f";
-    const sc_name = "vision_data";
-    const params = [];
-    executeF(sc_name,f_name, params)
-    .then(result => {
-        res.status(200).json(result);
-    })
-    .catch(err => {
-        res.status(500).json({error: err});
-    });
-})
-
-router.get('/:deploymentID',(req,res,next)=>{
-    const id = req.params.deploymentID;
-    const message = "Handling requests for deployment "+id+" number"
-    res.status(200).json({  
-        message:  message
-    });
-})
-
-router.post('/',(req,res,next)=>{
-    const deployment = {
-        deployment_id: req.body.deployment_id,
-        deployment_name: req.body.deployment_name,
-        target_id: req.body.target_id,
-        status_value: req.body.status_value,
-        model_id: req.body.model_id,
-        creation_date: req.body.creation_date,
-        start_date: req.body.start_date,
-        expiry_date: req.body.expiry_date
-    };
-    console.log(deployment.expiry_date)
-    res.status(200).json({  
-        message: deployment.expiry_date
     });
 })
 

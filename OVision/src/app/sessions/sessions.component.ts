@@ -16,28 +16,37 @@ export class SessionsComponent implements OnInit {
   constructor(private getDeploymentsService: GetDeploymentsService) { }
 
   ngOnInit() {
-    this.getDeploymentsService.getDeployments().subscribe({
-      next: (data: any[]) => {
-        console.log("Fetched data:", data);
-        this.deploymentSessions = data.map(item => new Deployment(
-          item[0], 
-          item[1], 
-          item[2], 
-          item[3],
-          item[4],
-          item[5],
-          new Date(item[6] * 1000), 
-          new Date(item[7] * 1000)   
-        ));
-        this.updateDisplayedSessions();
-      },
-      error: (error) => console.error('Error fetching deployments:', error)
-    });
-  }
+    console.log("Updating pages")
+    this.fetchDeployments();
+  } 
 
   onPageChange(newPage: number) {
     this.currentPage = newPage;
     this.updateDisplayedSessions();
+  }
+
+  fetchDeployments() {
+    console.log("Fetching deployments")
+    this.getDeploymentsService.getDeployments(this.itemsPerPage, this.currentPage).subscribe({
+      next: (data: any[]) => {
+        console.log("Fetched data:", data);
+        const deployments = data.flatMap(item => item.get_latest_deployments).map(deployment => {
+          return new Deployment(
+            deployment.deployment_id.toString(), 
+            deployment.deployment_name,
+            deployment.target_id.toString(),
+            deployment.status_value,
+            deployment.model_id.toString(),
+            new Date(deployment.creation_date), 
+            new Date(deployment.start_date),
+            new Date(deployment.expiry_date)
+          );
+        });
+        this.deploymentSessions = deployments;
+        this.updateDisplayedSessions();
+      },
+      error: (error) => console.error('Error fetching deployments:', error)
+    });
   }
 
   updateDisplayedSessions() {

@@ -1,8 +1,6 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-
-import { Deployment } from 'src/shared/models/Entities';
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +8,15 @@ import { Deployment } from 'src/shared/models/Entities';
 export class GetDeploymentsService {
   constructor(private http: HttpClient) { }
 
-  getDeployments(): Observable<any[]> {
-    return this.http.get<any[]>('assets/db-standin/deployments.JSON');
+
+  getDeployments(itemLimit: number = 10, currentPage: number = 1): Observable<any[]> {
+
+    const url = 'http://localhost:3000/deployments/';
+
+    const params = new HttpParams()
+      .set('itemLimit', itemLimit.toString())
+      .set('currentPage', currentPage.toString());
+
+    return this.http.get<any[]>(url, { params });
   }
 }

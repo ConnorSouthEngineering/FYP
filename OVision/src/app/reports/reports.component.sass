@@ -64,6 +64,11 @@ div
         text-align: center
         color: $dark-colour
         background:$light-colour
+        &.lg
+            display: flex
+            justify-content: center
+            align-items: center
+            min-width:300px 
     th
         width: fit-content
         padding:20px
@@ -71,8 +76,6 @@ div
             background:$dark-colour
         &:nth-child(even)
             background:$info-colour
-        &.tn
-            width:200px
 
 .options-bar
     max-height: 50px

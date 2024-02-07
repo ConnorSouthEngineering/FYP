@@ -5,8 +5,9 @@ async function executeF(schema_name, function_name, params) {
     let result;
     try {
         const paramPlaceholders = params.map((_, index) => `$${index + 1}`).join(', ');
-        const queryText = `SELECT * FROM ${schema_name}.${function_name}(${paramPlaceholders})`;
-        result = await client.query(queryText, params);
+        const queryText = `SELECT ${schema_name}.${function_name}(${paramPlaceholders})`;
+        console.log("Executing Query: "+queryText);
+        result = await client.query(queryText,params);
     } catch (err) {
         console.log(err);
         return "Error executing function";

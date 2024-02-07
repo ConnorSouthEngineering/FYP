@@ -52,8 +52,8 @@
         <td>{{session.status_value}}</td>
         <td>{{session.running_time}} hrs</td>
         <td>{{session.model_id}}</td>
-        <td>{{session.start_date.getDay()}}/{{session.start_date.getMonth()}}/{{session.start_date.getFullYear()}}</td>
-        <td>{{session.end_date.getDay()}}/{{session.end_date.getMonth()}}/{{session.end_date.getFullYear()}}</td>
+        <td>{{session.start_date.getDate()}}/{{session.start_date.getMonth() + 1}}/{{session.start_date.getFullYear()}}</td>
+        <td>{{session.expiry_date.getDate()}}/{{session.expiry_date.getMonth() + 1}}/{{session.expiry_date.getFullYear()}}</td>        
         <td>
           <img src="assets/svg/analytics.svg" alt="Analytics Icon">
         </td>

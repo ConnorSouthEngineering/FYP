@@ -49,9 +49,14 @@
       <tr *ngFor="let session of displayedSessions">
         <td>{{session.report_name}}</td>
         <td>{{session.deployment_id}}</td>
-        <td>{{session.frequency}} {{session.frequency_type}}</td>
-        <td>{{session.last_gen.getDay()}}/{{session.last_gen.getMonth()}}/{{session.last_gen.getFullYear()}}</td>
-        <td>{{session.next_gen.getDay()}}/{{session.next_gen.getMonth()}}/{{session.next_gen.getFullYear()}}</td>
+        <td>{{session.frequency_value}} {{session.frequency_unit}}</td>
+        <div *ngIf="!session.last_gen" >
+        <td class="lg">Null</td>
+        </div>
+        <div *ngIf="session.last_gen" >
+          <td>{{session.last_gen.getDate()}}/{{session.last_gen.getMonth() + 1}}/{{session.last_gen.getFullYear()}}</td>
+          </div>
+        <td>{{session.calculateNextGen().getDate()}}/{{session.calculateNextGen().getMonth() + 1}}/{{session.calculateNextGen().getFullYear()}}</td>
         <td>
           <a [routerLink]="['/report', session.report_id]">
             <img src="assets/svg/analytics.svg" alt="Analytics Icon">

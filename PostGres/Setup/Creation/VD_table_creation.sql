@@ -5,7 +5,7 @@ BEGIN;
 CREATE TYPE FREQUENCY_UNIT AS ENUM ('day','week','month','year');
 
 CREATE TABLE Targets(
-    target_id INT PRIMARY KEY NOT NULL,
+    target_id BIGSERIAL PRIMARY KEY,
     target_name VARCHAR NOT NULL,
     alt_name VARCHAR,
     creation_date DATE NOT NULL,
@@ -17,7 +17,7 @@ CREATE TABLE Targets(
 );
 
 CREATE TABLE Sources(
-    source_id INT PRIMARY KEY NOT NULL,
+    source_id BIGSERIAL PRIMARY KEY,
     source_name VARCHAR,
     company_name VARCHAR,
     vers VARCHAR,
@@ -27,42 +27,42 @@ CREATE TABLE Sources(
 );
 
 CREATE TABLE Classes(
-    class_id INT PRIMARY KEY NOT NULL,
+    class_id BIGSERIAL PRIMARY KEY,
     class_name VARCHAR NOT NULL,
     data_count INT NOT NULL
 );
 
 CREATE TABLE ClassSources(
-    class_source_id INT PRIMARY KEY NOT NULL,
+    class_source_id BIGSERIAL PRIMARY KEY,
     class_id INT REFERENCES Classes(class_id) NOT NULL,
     source_id INT REFERENCES Sources(source_id) NOT NULL
 );
 
 CREATE TABLE Categories(
-    category_id INT PRIMARY KEY NOT NULL,
+    category_id BIGSERIAL PRIMARY KEY,
     category_name VARCHAR
 );
 
 CREATE TABLE ClassCategories(
-    class_category_id INT PRIMARY KEY NOT NULL,
+    class_category_id BIGSERIAL PRIMARY KEY,
     class_id INT REFERENCES Classes(class_id),
     category_id INT REFERENCES Categories(category_id)
 );
 
 CREATE TABLE Models(
-    model_id INT PRIMARY KEY NOT NULL,
+    model_id BIGSERIAL PRIMARY KEY,
     model_name VARCHAR NOT NULL,
     creation_date DATE NOT NULL
 );
 
 CREATE TABLE ModelClasses(
-    model_class_id INT PRIMARY KEY NOT NULL,
+    model_class_id BIGSERIAL PRIMARY KEY,
     model_id INT REFERENCES Models(model_id),
     class_id INT REFERENCES Classes(class_id)
 );
 
 CREATE TABLE Deployments(
-    deployment_id INT PRIMARY KEY NOT NULL,
+    deployment_id BIGSERIAL PRIMARY KEY,
     deployment_name VARCHAR NOT NULL,
     target_id INT REFERENCES Targets(target_id) NOT NULL,
     status_value VARCHAR NOT NULL,
@@ -73,28 +73,29 @@ CREATE TABLE Deployments(
 );
 
 CREATE TABLE GraphMap(
-    graph_id INT PRIMARY KEY NOT NULL,
+    graph_id BIGSERIAL PRIMARY KEY,
     graph_type VARCHAR NOT NULL
 );
 
 CREATE TABLE Reports(
-    report_id INT PRIMARY KEY NOT NULL,
+    report_id BIGSERIAL PRIMARY KEY,
     report_name VARCHAR NOT NULL,
     deployment_id INT REFERENCES Deployments(deployment_id)  NOT NULL,
     frequency_value DECIMAL(4,2) NOT NULL,
     frequency_unit FREQUENCY_UNIT NOT NULL,
+    creation_date DATE NOT NULL,
     last_gen DATE,
     graph_id INT REFERENCES GraphMap(graph_id) NOT NULL
 );
 
 CREATE TABLE ReportClasses(
-    report_class_id INT PRIMARY KEY NOT NULL,
+    report_class_id BIGSERIAL PRIMARY KEY,
     class_id INT REFERENCES Classes(class_id),
     report_id INT REFERENCES Reports(report_id)
 );
 
 CREATE TABLE DataTotalEntry(
-    entry_num INT NOT NULL,
+    entry_num BIGSERIAL NOT NULL,
     deployment_id INT NOT NULL,
     class_id INT NOT NULL REFERENCES Classes(class_id), 
     creation_date DATE NOT NULL,

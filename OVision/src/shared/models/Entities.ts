@@ -1,5 +1,3 @@
-import {v4 as uuid} from 'uuid';
-
 export class Target {
     constructor(
         public target_name: string,
@@ -39,9 +37,6 @@ export class Person extends Target {
         return age;
     }
 
-/*     private generateUniqueId(): string {
-        return uuid();
-    } */
 }
 
 export class Location extends Target {
@@ -63,11 +58,20 @@ export class Deployment {
         public deployment_name: string,
         public target_id: string,
         public status_value: 'Active' | 'Complete' | 'Expiring' | 'Error',
-        public running_time: number,
         public model_id: string,
+        public creation_date: Date,
         public start_date: Date,
-        public end_date: Date
+        public expiry_date: Date
     ){}
+
+    get running_time(): number {
+        const currentDate = new Date();
+        const startDateMidnight = new Date(this.start_date);
+        startDateMidnight.setHours(0, 0, 0, 0); 
+        const timeDiff = currentDate.getTime() - startDateMidnight.getTime();
+        const hoursDiff = timeDiff / (1000 * 3600); 
+        return Math.floor(hoursDiff); 
+    }
 }
 
 export class Report {
@@ -75,11 +79,32 @@ export class Report {
         public report_id: string,
         public report_name: string,
         public deployment_id: string,
-        public frequency: number,
-        public frequency_type: string,
-        public last_gen: Date,
-        public next_gen: Date,
-        public graph_type: string,
-        public activity_set: Array<string>
-    ){}
+        public frequency_value: number,
+        public frequency_unit: string,
+        public creation_date: Date,
+        public last_gen: Date | null,
+        public graph_id: string,
+    ) {}
+
+    public calculateNextGen(): Date {
+        let baseDate = this.last_gen ? new Date(this.last_gen) : new Date(this.creation_date);
+
+        switch (this.frequency_unit) {
+            case 'day':
+                baseDate.setDate(baseDate.getDate() + this.frequency_value);
+                break;
+            case 'week':
+                baseDate.setDate(baseDate.getDate() + (this.frequency_value * 7));
+                break;
+            case 'month':
+                baseDate.setMonth(baseDate.getMonth() + this.frequency_value);
+                break;
+            case 'year':
+                baseDate.setFullYear(baseDate.getFullYear() + this.frequency_value);
+                break;
+            default:
+                throw new Error('Unsupported frequency unit');
+        }
+        return new Date(baseDate);
+    }
 }
