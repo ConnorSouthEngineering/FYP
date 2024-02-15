@@ -14,7 +14,7 @@ DECLARE
     new_report_id INT;
 BEGIN
     SET SCHEMA 'vision_data';
-    INSERT INTO Reports(report_name, deployment_id, frequency_value, frequency_unit, creation_date, last_gen, graph_id)
+    INSERT INTO reports(report_name, deployment_id, frequency_value, frequency_unit, creation_date, last_gen, graph_id)
     VALUES (_report_name, _deployment_id, _frequency_value, _frequency_unit, _creation_date, _last_gen, _graph_id)
     RETURNING report_id INTO new_report_id;
     

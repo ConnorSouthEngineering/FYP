@@ -14,7 +14,7 @@ DECLARE
     new_deployment_id INT;
 BEGIN
     SET SCHEMA 'vision_data';
-    INSERT INTO Deployments(deployment_name, target_id, status_value, model_id, creation_date, start_date, expiry_date)
+    INSERT INTO deployments(deployment_name, target_id, status_value, model_id, creation_date, start_date, expiry_date)
     VALUES (_deployment_name, _target_id, _status_value, _model_id, _creation_date, _start_date, _expiry_date)
     RETURNING deployment_id INTO new_deployment_id;
     

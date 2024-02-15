@@ -14,7 +14,7 @@ DECLARE
     new_target_id INT;
 BEGIN
     SET SCHEMA 'vision_data';
-    INSERT INTO Targets(target_name, alt_name, creation_date, status_value, access, dob, age, role)
+    INSERT INTO targets(target_name, alt_name, creation_date, status_value, access, dob, age, role)
     VALUES (_target_name, _alt_name, _creation_date, _status_value, _access, _dob, _age, _role)
     RETURNING target_id INTO new_target_id;
     

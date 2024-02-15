@@ -3,6 +3,22 @@ import fnmatch
 import random
 import shutil
 from datetime import datetime
+import requests
+from typing import List
+
+class Data_Split:
+    def __init__(self, train:int, val:int, test:int):
+        self.train: int = train
+        self.val: int = val
+        self.test: int = test
+
+class Model_Config:
+    def __init__(self, task_id:int, classes:List[str], sources:List[str], splits:Data_Split):
+        self.task_id: int = task_id
+        self.classes: List[str] = classes
+        self.sources: List[str] = sources
+        self.splits: Data_Split = splits
+
 
 def find_classes(parent_path, class_names):
     class_directories = {class_name: [] for class_name in class_names}  
@@ -19,6 +35,7 @@ def find_directories(sources, directory_path, classes):
     class_paths = {}
     for source in sources:
         source_path = os.path.join(directory_path, source)
+        print(source_path)
         if os.path.exists(source_path):  
             found_directories = find_classes(source_path, classes)
             for class_name, paths in found_directories.items():
@@ -110,24 +127,45 @@ def copy_files(final_files, splits):
                 print(f"Copied {file_path} to {dest_path}")
     return base_dir
 
-def main():
-    classes = ["cook", "pour"]
-    sources = ["toyota", "mit"]
-    directory_path = "./Sources"
-    splits = {"train": 6, "val": 2, "test": 2}
+def get_model_parmeters(task_id):
+    try:
+        classes_result = requests.get(f"http://localhost:3000/tasks/{task_id}/classes")
+        sources_result = requests.get(f"http://localhost:3000/tasks/{task_id}/sources")
+        task_result = requests.get(f"http://localhost:3000/tasks/{task_id}")
+        classes = classes_result.json()[0]['get_task_classes']["classes"]
+        sources = sources_result.json()[0]['get_task_sources']["sources"]
+        task = task_result.json()[0]['get_task'][0]
+        splits = {"train": task['train'], "validation":task['verification'], "test":task['test']}
+        return classes, sources, splits
+    except:
+        print("Change status to failed")
+
+def get_class_maps(classes):
+    class_result = requests.get(f"http://localhost:3000/maps/class")
+    class_map = class_result.json()[0]['get_class_map']
+    class_names = []
+    for class_id in classes:
+        class_names.append(class_map[f"{class_id}"])
+    return class_names
+
+def get_source_maps(sources):
+    source_result = requests.get(f"http://localhost:3000/maps/source")
+    source_map = source_result.json()[0]['get_source_map']
+    source_names = []
+    for source_id in sources:
+        source_names.append(source_map[f"{source_id}"])
+    return source_names
+
+def pull_files(task_id):
+    classes, sources, splits = get_model_parmeters(task_id)
+    classes = get_class_maps(classes)
+    sources = get_source_maps(sources)
+    directory_path = "./sources"  
     class_paths = find_directories(sources, directory_path, classes)
     class_files = find_files(class_paths)
     display_tree(class_files)
     final_files = adjust_count(class_files,sum(splits.values()))
-    print("######################")
-    print("######################")
     display_tree(final_files)
     base_dir = copy_files(final_files,splits)
     print(f"Files Moved to {base_dir}")
-
-main()
-
-
-
-
-
+    return base_dir  

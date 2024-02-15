@@ -38,6 +38,28 @@ CREATE TABLE ClassSources(
     source_id INT REFERENCES Sources(source_id) NOT NULL
 );
 
+CREATE TABLE ModelTask(
+    task_id BIGSERIAL PRIMARY KEY,
+    model_name VARCHAR NOT NULL,
+    creation_date DATE NOT NULL,
+    status_value VARCHAR NOT NULL,
+    train INT NOT NULL,
+    test INT NOT NULL,
+    verification INT NOT NULL
+);
+
+CREATE TABLE TaskClass(
+    task_class_id BIGSERIAL PRIMARY KEY,
+    class_id INT REFERENCES Classes(class_id) NOT NULL,
+    task_id INT REFERENCES ModelTask(task_id) NOT NULL
+);
+
+CREATE TABLE TaskSources(
+    task_sources_id BIGSERIAL PRIMARY KEY,
+    source_id INT REFERENCES Sources(source_id) NOT NULL,
+    task_id INT REFERENCES ModelTask(task_id) NOT NULL
+);
+
 CREATE TABLE Categories(
     category_id BIGSERIAL PRIMARY KEY,
     category_name VARCHAR

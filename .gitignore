@@ -1,2 +1,3 @@
 NVision/venv/
-NVision/Sources/
+NVision/app/sources/
+NVision/app/processing*

@@ -24,5 +24,15 @@ router.get('/class', (req, res, next) => {
         res.status(500).json({ error: err });
     });
 });
+router.get('/source', (req, res, next) => {
+    const params = [];
+    executeF("vision_data", "get_source_map", params)
+        .then(result => {
+        res.status(200).json(result);
+    })
+        .catch(err => {
+        res.status(500).json({ error: err });
+    });
+});
 module.exports = router;
 //# sourceMappingURL=maps.js.map

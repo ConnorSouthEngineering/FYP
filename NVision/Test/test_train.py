@@ -62,3 +62,5 @@ with tf.device('/GPU:0'):
     )
 
     model.save('./test.h5')
+
+    input()
