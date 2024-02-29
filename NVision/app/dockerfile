@@ -1,8 +1,4 @@
 FROM nvcr.io/nvidia/cuda:12.3.1-devel-ubuntu22.04
-ARG BATCH_TO_COPY
-RUN apt-get update
-RUN apt-get install -y python3-pip
-RUN pip install tensorflow[and-cuda] keras-cv
+RUN apt-get update && apt-get install -y python3-pip libgl1-mesa-glx libglib2.0-0 && pip install tensorflow[and-cuda] opencv-python matplotlib seaborn
 WORKDIR /home
-COPY $BATCH_TO_COPY /home
-ENTRYPOINT ["python3", "test_train.py"]
+COPY ./docker_components /home

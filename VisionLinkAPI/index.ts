@@ -6,4 +6,4 @@ const server = http.createServer(app);
 
 server.listen(port)
 
-///RUN NPM BUILD TO COMPILE THE TYPESCRIPT INTO JAVASCRIPT
+///NPM run BUILD TO COMPILE THE TYPESCRIPT INTO JAVASCRIPT

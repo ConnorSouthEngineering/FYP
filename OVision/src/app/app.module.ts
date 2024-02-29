@@ -14,6 +14,7 @@ import { ReportComponent } from './reports/report/report.component';
 import { ReportsComponent } from './reports/reports.component';
 import { LineGraphComponent } from './reports/graphs/line-graph/line-graph.component';
 import { BarGraphComponent } from './reports/graphs/bar-graph/bar-graph.component';
+import { TargetComponent } from './targets/targets.component';
 
 @NgModule({
   declarations: [
@@ -25,7 +26,8 @@ import { BarGraphComponent } from './reports/graphs/bar-graph/bar-graph.componen
     ReportComponent,
     ReportsComponent,
     LineGraphComponent,
-    BarGraphComponent
+    BarGraphComponent,
+    TargetComponent
   ],
   imports: [
     BrowserModule,

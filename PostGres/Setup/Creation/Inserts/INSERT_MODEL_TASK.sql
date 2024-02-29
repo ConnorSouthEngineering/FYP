@@ -1,6 +1,10 @@
 SET SCHEMA 'vision_data';
 CREATE OR REPLACE FUNCTION INSERT_MODEL_TASK(
     _model_name VARCHAR,
+    _epochs INT,
+    _num_frames INT,
+    _shuffle_size INT,
+    _batch_size INT,
     _creation_date DATE,
     _status_value VARCHAR,
     _train INT,
@@ -34,8 +38,8 @@ BEGIN
             END IF;
         END LOOP;
 
-        INSERT INTO modeltask(model_name, creation_date, status_value, train, test, verification)
-        VALUES (_model_name, _creation_date, _status_value, _train, _test, _verification)
+        INSERT INTO modeltask(model_name, epochs, num_frames, shuffle_size, batch_size, creation_date, status_value, train, test, verification)
+        VALUES (_model_name, _epochs, _num_frames, _shuffle_size, _batch_size, _creation_date, _status_value, _train, _test, _verification)
         RETURNING task_id INTO new_task_id;
 
         FOR class IN SELECT value::int FROM json_array_elements_text(_classes) AS value

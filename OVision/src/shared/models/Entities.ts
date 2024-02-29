@@ -1,5 +1,6 @@
 export class Target {
     constructor(
+        public target_id:number, 
         public target_name: string,
         public alt_name: string,
         public creation_date: Date,
@@ -13,7 +14,7 @@ export class Person extends Target {
     public age: number;
 
     constructor(
-        public target_id:string, 
+        target_id:number, 
         target_name: string, 
         alt_name: string, 
         creation_date: Date, 
@@ -21,13 +22,13 @@ export class Person extends Target {
         dob: Date, 
         role: string) 
         {
-        super(target_name, alt_name, creation_date, status_value);
+        super(target_id, target_name, alt_name, creation_date, status_value);
         this.dob = dob;
         this.role = role;
         this.age = this.getAge(dob);
     }
 
-    private getAge(dob: Date): number {
+    public getAge(dob: Date): number {
         const today = new Date();
         const age = today.getFullYear() - dob.getFullYear();
         const month = today.getMonth() - dob.getMonth();
@@ -41,14 +42,14 @@ export class Person extends Target {
 
 export class Location extends Target {
     constructor(
-        public target_id:string,
+        target_id:number,
         target_name: string,
         alt_name: string,
         creation_date: Date,
         status_value: 'Active' | 'Complete' | 'Expiring' | 'Error',
         public access: 'public' | 'private') 
         {
-        super(target_name, alt_name, creation_date, status_value);
+        super(target_id,target_name, alt_name, creation_date, status_value);
     }
 }
 

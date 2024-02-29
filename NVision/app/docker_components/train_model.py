@@ -1,87 +1,161 @@
 import tensorflow as tf
 import pathlib
-from keras import layers, utils, losses, optimizers, Model
+from keras import layers, utils, losses, optimizers, Sequential
 from load_data import FrameGenerator
-from model_creation import Conv2Plus1D, add_residual_block, ResizeVideo
 from visualise_results import plot_history, get_actual_predicted_labels, plot_confusion_matrix
-# Define the dimensions of one frame in the set of frames created
-HEIGHT = 224
-WIDTH = 224
+import argparse
+import configparser
+
+def extract_data(folder_path, num_frames):
+        
+    output_signature = (tf.TensorSpec(shape = (None, None, None, 3), dtype = tf.float32),
+                        tf.TensorSpec(shape = (), dtype = tf.int16))
+    
+    train_ds = tf.data.Dataset.from_generator(FrameGenerator(pathlib.Path(folder_path+"/train"), num_frames, training=True),
+                                                output_signature = output_signature)                                       
+    val_ds = tf.data.Dataset.from_generator(FrameGenerator(pathlib.Path(folder_path+"/validation"), num_frames),
+                                                output_signature = output_signature)
+    test_ds = tf.data.Dataset.from_generator(FrameGenerator(pathlib.Path(folder_path+"/test"), num_frames),
+                                                output_signature = output_signature)
+    
+    return train_ds, val_ds, test_ds
+
+def initialise_cache(train_ds, val_ds, test_ds):
+    train_ds = train_ds.cache(filename="./cache/train_cache")
+    val_ds = val_ds.cache(filename="./cache/val_cache")
+    test_ds = test_ds.cache(filename="./cache/test_cache")
+    
+    return train_ds, val_ds, test_ds
+
+def prefetch_data(train_ds, val_ds, test_ds, AUTOTUNE, shuffle_size=100):
+    train_ds = train_ds.shuffle(shuffle_size).prefetch(buffer_size = AUTOTUNE)
+    val_ds = val_ds.shuffle(shuffle_size).prefetch(buffer_size = AUTOTUNE)
+    test_ds = test_ds.shuffle(shuffle_size).prefetch(buffer_size = AUTOTUNE)
+
+    return train_ds, val_ds, test_ds
+
+def initialise_batch(train_ds, val_ds, test_ds, batch_size):
+    train_ds = train_ds.batch(batch_size)
+    val_ds = val_ds.batch(batch_size)
+    test_ds = test_ds.batch(batch_size)
+
+    return train_ds, val_ds, test_ds
+
+def create_model(num_frames, height, width, folder_path):
+    input_shape = (num_frames, height, width, 3)
+
+    model = Sequential()
+
+    model.add(layers.ConvLSTM2D(filters = 4, kernel_size = (3, 3), activation = 'tanh',data_format = "channels_last",
+                            recurrent_dropout=0.2, return_sequences=True, input_shape = input_shape))
+        
+    model.add(layers.MaxPooling3D(pool_size=(1, 2, 2), padding='same', data_format='channels_last'))
+    model.add(layers.TimeDistributed(layers.Dropout(0.2)))
+    
+    model.add(layers.ConvLSTM2D(filters = 8, kernel_size = (3, 3), activation = 'tanh', data_format = "channels_last",
+                            recurrent_dropout=0.2, return_sequences=True))
+        
+    model.add(layers.MaxPooling3D(pool_size=(1, 2, 2), padding='same', data_format='channels_last'))
+    model.add(layers.TimeDistributed(layers.Dropout(0.2)))
+        
+    model.add(layers.ConvLSTM2D(filters = 14, kernel_size = (3, 3), activation = 'tanh', data_format = "channels_last",
+                            recurrent_dropout=0.2, return_sequences=True))
+        
+    model.add(layers.MaxPooling3D(pool_size=(1, 2, 2), padding='same', data_format='channels_last'))
+    model.add(layers.TimeDistributed(layers.Dropout(0.2)))
+        
+    model.add(layers.ConvLSTM2D(filters = 16, kernel_size = (3, 3), activation = 'tanh', data_format = "channels_last",
+                            recurrent_dropout=0.2, return_sequences=True))
+        
+    model.add(layers.MaxPooling3D(pool_size=(1, 2, 2), padding='same', data_format='channels_last'))
+        
+    model.add(layers.Flatten()) 
+    num_classes = sum(1 for _ in pathlib.Path(folder_path+"/train").iterdir() if _.is_dir())
+    model.add(layers.Dense(num_classes, activation = "softmax"))
+    model.summary()
+    return model
+
+def get_class_maps(folder_path, num_frames):
+    fg = FrameGenerator(pathlib.Path(folder_path+"/train"), num_frames, training=True)
+    classes= fg.class_ids_for_name
+    labels = list(classes.keys())
+    return labels
 
 
-folder_path = "./processing-2024-02-15-23-22-14"
+def generate_config(model_name, folder_path, epochs, num_frames, shuffle_size, batch_size, height, width):
+    labels = get_class_maps(folder_path, num_frames)
+    config = configparser.ConfigParser()
+    config['PREDICTION'] = {
+        'num_frames': num_frames,
+        'class_list': labels,
+        'height': height,
+        'width': width
+    }
+    config['TRAINING'] = {
+        'epochs': epochs,
+        'shuffle_size': shuffle_size,
+        'batch_size': batch_size
+    }
+    with open(f'{folder_path}/{model_name}.conf', 'w') as configfile:
+        config.write(configfile)
+    return labels
 
-output_signature = (tf.TensorSpec(shape = (None, None, None, 3), dtype = tf.float32),
-                    tf.TensorSpec(shape = (), dtype = tf.int16))
-train_ds = tf.data.Dataset.from_generator(FrameGenerator(pathlib.Path(folder_path+"/train"), 30, training=True),
-                                          output_signature = output_signature)
-                                          
-# Create the validation set
-val_ds = tf.data.Dataset.from_generator(FrameGenerator(pathlib.Path(folder_path+"/validation"), 10),
-                                        output_signature = output_signature)
+def main():
+    with tf.device('/GPU:0'):
+        parser = argparse.ArgumentParser()
+        parser.add_argument('--model_name', type=str, default="test1")
+        parser.add_argument('--epochs', type=int, default=15)
+        parser.add_argument('--num_frames', type=int, default=10)
+        parser.add_argument('--shuffle_size', type=int, default=200)
+        parser.add_argument('--batch_size', type=int, default=3)
+        args = parser.parse_args()
+        model_name = args.model_name
+        epochs = args.epochs
+        num_frames = args.num_frames
+        shuffle_size = args.shuffle_size
+        batch_size = args.batch_size 
 
-test_ds = tf.data.Dataset.from_generator(FrameGenerator(pathlib.Path(folder_path+"/test"), 10),
-                                        output_signature = output_signature)
+        height = 224
+        width = 224
+        
+        folder_path = "/mnt"
 
-# Print the shapes of the data
-AUTOTUNE = tf.data.AUTOTUNE
+        train_ds, val_ds, test_ds = extract_data(folder_path, num_frames)
 
-train_ds = train_ds.cache().shuffle(1000).prefetch(buffer_size = AUTOTUNE)
-val_ds = val_ds.cache().shuffle(1000).prefetch(buffer_size = AUTOTUNE)
-test_ds = test_ds.cache().shuffle(1000).prefetch(buffer_size = AUTOTUNE)
+        AUTOTUNE = tf.data.AUTOTUNE
 
-train_ds = train_ds.batch(2)
-val_ds = val_ds.batch(2)
-test_ds = test_ds.batch(2)
+        train_ds, val_ds, test_ds = initialise_cache(train_ds, val_ds, test_ds)
 
-input_shape = (None, 10, HEIGHT, WIDTH, 3)
-input = layers.Input(shape=(input_shape[1:]))
-x = input
+        train_ds, val_ds, test_ds = prefetch_data(train_ds, val_ds, test_ds, AUTOTUNE, shuffle_size)
 
-x = Conv2Plus1D(filters=16, kernel_size=(3, 7, 7), padding='same')(x)
-x = layers.BatchNormalization()(x)
-x = layers.ReLU()(x)
-x = ResizeVideo(HEIGHT // 2, WIDTH // 2)(x)
+        train_ds, val_ds, test_ds = initialise_batch(train_ds, val_ds, test_ds, batch_size)
 
-# Block 1
-x = add_residual_block(x, 16, (3, 3, 3))
-x = ResizeVideo(HEIGHT // 4, WIDTH // 4)(x)
+        model = create_model(num_frames, height, width, folder_path)
+        
+        callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=3)
 
-# Block 2
-x = add_residual_block(x, 32, (3, 3, 3))
-x = ResizeVideo(HEIGHT // 8, WIDTH // 8)(x)
+        model.compile(loss = losses.SparseCategoricalCrossentropy(from_logits=False), 
+                    optimizer = optimizers.Adam(learning_rate = 0.0001), 
+                    metrics = ['accuracy'])
 
-# Block 3
-x = add_residual_block(x, 64, (3, 3, 3))
-x = ResizeVideo(HEIGHT // 16, WIDTH // 16)(x)
+        history = model.fit(x = train_ds,
+                            epochs = epochs, 
+                            validation_data = val_ds,
+                            batch_size=32,
+                            callbacks=[callback])
+        plot_history(history, model_name, folder_path)
+            
+        model.evaluate(test_ds, return_dict=True)
+            
+        labels = generate_config(model_name, folder_path, epochs, num_frames, shuffle_size, batch_size, height, width)
 
-# Block 4
-x = add_residual_block(x, 128, (3, 3, 3))
+        actual, predicted = get_actual_predicted_labels(model, train_ds)
+        plot_confusion_matrix(actual, predicted, labels, 'training', model_name, folder_path)
 
-x = layers.GlobalAveragePooling3D()(x)
-x = layers.Flatten()(x)
-x = layers.Dense(10)(x)
+        actual, predicted = get_actual_predicted_labels(model, test_ds)
+        plot_confusion_matrix(actual, predicted, labels, 'test', model_name, folder_path)
+        model.save(f"{folder_path}/{model_name}.h5")
+        input()
 
-model = Model(input, x)
-
-utils.plot_model(model, expand_nested=True, dpi=60, show_shapes=True, to_file='model.png')
-
-model.compile(loss = losses.SparseCategoricalCrossentropy(from_logits=True), 
-              optimizer = optimizers.Adam(learning_rate = 0.0001), 
-              metrics = ['accuracy'])
-
-history = model.fit(x = train_ds,
-                    epochs = 50, 
-                    validation_data = val_ds)
-
-plot_history(history)
-model.evaluate(test_ds, return_dict=True)
-
-fg = FrameGenerator(pathlib.Path(folder_path+"/train"), 10, training=True)
-labels = list(fg.class_ids_for_name.keys())
-
-actual, predicted = get_actual_predicted_labels(model, train_ds)
-plot_confusion_matrix(actual, predicted, labels, 'training')
-
-actual, predicted = get_actual_predicted_labels(model, test_ds)
-plot_confusion_matrix(actual, predicted, labels, 'test')
+if __name__ == "__main__":
+    main()

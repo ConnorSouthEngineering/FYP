@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title></title>
+  <base href="/">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+</head>
+<body>
+    <div class="container">
+      <div class="column">
+        <div class="box">
+          <div class="title">
+            <h1 class="title">Sessions History</h1>
+          </div>
+          <div class="options-bar">
+            <div class="options-group search">
+              <img src="assets/svg/search.svg" alt="Search">
+              <p>Search</p>
+            </div>
+            <div class="options-group filter">
+              <p>Filter</p>
+              <img src="assets/svg/filter.svg" alt="Filter">
+            </div>
+          </div>
+          <div *ngIf="persons.length == 0; else personTable" >
+            <h1>No Sessions Currently Available</h1>
+          </div>
+          <div *ngIf="locations.length == 0; else locationTable" >
+            <h1>No Sessions Currently Available</h1>
+          </div>  
+          <div>
+            <app-pagination [totalItems]="maxLength" [itemsPerPage]="itemsPerPage" (pageChange)="onPageChange($event)"></app-pagination>
+          </div>
+        </div>
+      </div>
+    </div>
+</body>
+<ng-template #personTable>
+  <div class="table">
+    <table>
+      <tr>
+        <th>Target Name</th>
+        <th>Alt Name</th>
+        <th>Creation Date</th>
+        <th>Status</th>
+        <th>Dob</th>
+        <th>Role</th>
+        <th>Age</th>
+        <th>Settings</th>
+      </tr>
+      <tr *ngFor="let person of displayedPersons">
+        <td>{{person.target_name}}</td>
+        <td>{{person.alt_name}}</td>
+        <td>{{person.creation_date.getDate()}}/{{person.creation_date.getMonth() + 1}}/{{person.creation_date.getFullYear()}}</td>
+        <td>{{person.status_value}}</td>
+        <td>{{person.dob.getDate()}}/{{person.dob.getMonth() + 1}}/{{person.dob.getFullYear()}}</td>
+        <td>{{person.role}}</td>
+        <td>{{person.getAge(person.dob)}}</td>                
+        <td>
+          <img src="assets/svg/settings.svg" alt="Settings Icon">
+        </td>
+      </tr>
+    </table>
+  </div>
+</ng-template>
+<ng-template #locationTable>
+    <div class="table">
+      <table>
+        <tr>
+          <th>Target Name</th>
+          <th>Alt Name</th>
+          <th>Creation Date</th>
+          <th>Status</th>
+          <th>Access</th>
+          <th>Settings</th>
+        </tr>
+        <tr *ngFor="let location of displayedLocations">
+          <td>{{location.target_name}}</td>
+          <td>{{location.alt_name}}</td>
+          <td>{{location.creation_date}} hrs</td>
+          <td>{{location.status_value}}</td>
+          <td>{{location.access}}</td>
+          <td>
+            <img src="assets/svg/settings.svg" alt="Settings Icon">
+          </td>
+        </tr>
+      </table>
+    </div>
+  </ng-template>
+</html>

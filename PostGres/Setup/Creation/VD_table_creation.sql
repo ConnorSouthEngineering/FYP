@@ -12,7 +12,6 @@ CREATE TABLE Targets(
     status_value VARCHAR NOT NULL,
     access VARCHAR,
     dob DATE, 
-    age INT,
     role VARCHAR
 );
 
@@ -41,6 +40,10 @@ CREATE TABLE ClassSources(
 CREATE TABLE ModelTask(
     task_id BIGSERIAL PRIMARY KEY,
     model_name VARCHAR NOT NULL,
+    epochs INT NOT NULL,
+    num_frames INT NOT NULL,
+    shuffle_size INT NOT NULL,
+    batch_size INT NOT NULL,
     creation_date DATE NOT NULL,
     status_value VARCHAR NOT NULL,
     train INT NOT NULL,
@@ -74,13 +77,27 @@ CREATE TABLE ClassCategories(
 CREATE TABLE Models(
     model_id BIGSERIAL PRIMARY KEY,
     model_name VARCHAR NOT NULL,
-    creation_date DATE NOT NULL
+    epochs INT NOT NULL,
+    num_frames INT NOT NULL,
+    shuffle_size INT NOT NULL,
+    batch_size INT NOT NULL,
+    creation_date DATE NOT NULL,
+    train INT NOT NULL,
+    test INT NOT NULL,
+    verification INT NOT NULL,
+    location_name VARCHAR NOT NULL
 );
 
 CREATE TABLE ModelClasses(
     model_class_id BIGSERIAL PRIMARY KEY,
     model_id INT REFERENCES Models(model_id),
     class_id INT REFERENCES Classes(class_id)
+);
+
+CREATE TABLE ModelSources(
+    model_sources_id BIGSERIAL PRIMARY KEY,
+    source_id INT REFERENCES Sources(source_id) NOT NULL,
+    model_id INT REFERENCES Models(model_id) NOT NULL
 );
 
 CREATE TABLE Deployments(

@@ -19,6 +19,10 @@ done
 for file in /docker-entrypoint-initdb.d/Creation/Queries/*.sql; do
   psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -v postgres_user="$POSTGRES_USER" -f "$file"
 done
+## Execute update function setups
+for file in /docker-entrypoint-initdb.d/Creation/Update/*.sql; do
+  psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -v postgres_user="$POSTGRES_USER" -f "$file"
+done
 ## Execute SP function setups
 for file in /docker-entrypoint-initdb.d/Creation/StoredProcedures/*.sql; do
   psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -v postgres_user="$POSTGRES_USER" -f "$file"

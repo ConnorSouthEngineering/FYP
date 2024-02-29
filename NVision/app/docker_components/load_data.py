@@ -2,8 +2,6 @@ import tensorflow as tf
 import cv2
 import random
 import numpy as np 
-import os
-import pathlib
 
 class FrameGenerator:
   def __init__(self, path, n_frames, training = False):
