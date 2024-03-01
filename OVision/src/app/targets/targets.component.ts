@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { GetTargetService } from './get-targets.service';
+import { GetMapService } from '../passive/get-maps.service'
 import { Location, Person, Target } from 'src/shared/models/Entities';
 
 @Component({
@@ -14,19 +15,41 @@ export class TargetComponent implements OnInit {
   displayedLocations: Location[] = [];
   currentPage: number = 1;
   itemsPerPage: number = 2;
-  maxLength: number = 1
-  constructor(private getTargetService: GetTargetService) { }
+  maxLength: number = 1;
+  constructor(private cdr: ChangeDetectorRef,
+    private getTargetService: GetTargetService,
+    private mapService: GetMapService) { }
 
   ngOnInit() {
     console.log("Updating pages")
+    this.fetchTargetCount();
     this.fetchTargets();
   } 
 
   onPageChange(newPage: number) {
     this.currentPage = newPage;
     console.log(this.currentPage)
+    this.fetchTargets();
     this.updateDisplayedSessions();
   }
+
+  fetchTargetCount(){
+    this.mapService.fetchCountMap().subscribe(countMaps => {
+      console.log(countMaps);
+      console.log(countMaps[0])
+      const countMap = countMaps[0]?.get_count_map;
+      if (countMap) {
+        console.log(countMap);
+        console.log(countMap['target_count']);
+        this.maxLength = countMap['target_count'];
+        console.log(this.maxLength)
+        this.cdr.detectChanges();
+      } else {
+        console.log('Count not retrieved');
+      }
+    });
+  }
+  
 
   fetchTargets() {
     console.log("Fetching Targets");
@@ -59,8 +82,6 @@ export class TargetComponent implements OnInit {
             ));
           }
         });
-        this.maxLength = Math.max(this.persons.length, this.locations.length);
-        console.log("max length:"+this.maxLength)
         this.updateDisplayedSessions();
       },
       error: (error) => console.error('Error fetching targets:', error)
@@ -70,7 +91,7 @@ export class TargetComponent implements OnInit {
   updateDisplayedSessions() {
     const startIndex = (this.currentPage - 1) * this.itemsPerPage;
     const endIndex = startIndex + this.itemsPerPage;
-    this.displayedPersons = this.persons.slice(startIndex, endIndex);
-    this.displayedLocations = this.locations.slice(startIndex, endIndex);
+    this.displayedPersons = this.persons;
+    this.displayedLocations = this.locations;
   }
 }

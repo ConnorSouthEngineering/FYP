@@ -9,6 +9,7 @@ import { catchError, startWith, switchMap, tap } from 'rxjs/operators';
 export class GetMapService {
   private classMapUrl = 'http://localhost:3000/maps/class';
   private graphMapUrl = 'http://localhost:3000/maps/graphs';
+  private countMapUrl = 'http://localhost:3000/maps/counts';
   private refreshInterval = 30 * 60 * 1000;
 
   constructor(private http: HttpClient) {
@@ -45,6 +46,14 @@ export class GetMapService {
         return this.fetchAndCache(this.graphMapUrl, 'graphMap');
       })
     ).subscribe();
+
+    interval(this.refreshInterval).pipe(
+      startWith(0),
+      switchMap(() => {
+        console.log('Refreshing countMap data'); 
+        return this.fetchAndCache(this.countMapUrl, 'countMap');
+      })
+    ).subscribe();
   }
 
   fetchClassMap(): Observable<any> {
@@ -55,6 +64,17 @@ export class GetMapService {
     } else {
       console.log('Fetching classMap from server');
       return this.fetchAndCache(this.classMapUrl, 'classMap');
+    }
+  }
+
+  fetchCountMap(): Observable<any> {
+    const cachedData = localStorage.getItem('countMap');
+    if (cachedData) {
+      console.log('Fetching countMap from cache'); 
+      return of(JSON.parse(cachedData));
+    } else {
+      console.log('Fetching countMap from server');
+      return this.fetchAndCache(this.countMapUrl, 'countMap');
     }
   }
 
