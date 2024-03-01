@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { GetTargetService } from './get-targets.service';
-import { GetMapService } from '../passive/get-maps.service'
+import { GetMapService } from '../passive/get-maps.service';
 import { Location, Person, Target } from 'src/shared/models/Entities';
 
 @Component({
@@ -11,8 +11,6 @@ import { Location, Person, Target } from 'src/shared/models/Entities';
 export class TargetComponent implements OnInit {
   persons: Person[] = [];
   locations: Location[] = []
-  displayedPersons: Person[] = [];
-  displayedLocations: Location[] = [];
   currentPage: number = 1;
   itemsPerPage: number = 2;
   maxLength: number = 1;
@@ -30,7 +28,6 @@ export class TargetComponent implements OnInit {
     this.currentPage = newPage;
     console.log(this.currentPage)
     this.fetchTargets();
-    this.updateDisplayedSessions();
   }
 
   fetchTargetCount(){
@@ -82,16 +79,9 @@ export class TargetComponent implements OnInit {
             ));
           }
         });
-        this.updateDisplayedSessions();
       },
       error: (error) => console.error('Error fetching targets:', error)
     });
   }
 
-  updateDisplayedSessions() {
-    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
-    const endIndex = startIndex + this.itemsPerPage;
-    this.displayedPersons = this.persons;
-    this.displayedLocations = this.locations;
-  }
 }

@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { GetReportsService } from './get-reports.service';
+import { GetMapService } from '../passive/get-maps.service';
 import { Report } from 'src/shared/models/Entities';
 
 @Component({
@@ -8,26 +9,49 @@ import { Report } from 'src/shared/models/Entities';
   styleUrls: ['./reports.component.sass']
 })
 export class ReportsComponent implements OnInit {
-  deploymentSessions: Report[] = [];
-  displayedSessions: Report[] = [];
+  reports: Report[] = [];
   currentPage: number = 1;
-  itemsPerPage: number = 2;
+  itemsPerPage: number = 1;
+  maxLength: number = 1;
 
-  constructor(private getReportsService: GetReportsService) { }
+  constructor(private cdr: ChangeDetectorRef,
+    private getReportsService: GetReportsService,
+    private mapService: GetMapService) { }
+
 
   ngOnInit() {
-    this.fetchReports();
-  }
-
+      console.log("Updating pages")
+      this.fetchReportCount();
+      this.fetchReports();
+    } 
+  
   onPageChange(newPage: number) {
-    this.currentPage = newPage;
-    this.fetchReports(); 
-  }
+      this.currentPage = newPage;
+      console.log(this.currentPage)
+      this.fetchReports();
+    }
 
+  fetchReportCount(){
+    this.mapService.fetchCountMap().subscribe(countMaps => {
+      console.log(countMaps);
+      console.log(countMaps[0])
+      const countMap = countMaps[0]?.get_count_map;
+      if (countMap) {
+        console.log(countMap);
+        console.log(countMap['report_count']);
+        this.maxLength = countMap['report_count'];
+        console.log(this.maxLength)
+        this.cdr.detectChanges();
+      } else {
+        console.log('Count not retrieved');
+      }
+    });
+  }
+  
   fetchReports() {
     this.getReportsService.getReports(this.itemsPerPage, this.currentPage).subscribe({
       next: (data: any[]) => {
-        this.deploymentSessions = data.flatMap(item => item.get_latest_reports).map(report => new Report(
+        const reports = data.flatMap(item => item.get_latest_reports).map(report => new Report(
           report.report_id.toString(), 
           report.report_name,
           report.deployment_id.toString(),
@@ -37,15 +61,9 @@ export class ReportsComponent implements OnInit {
           report.last_gen ? new Date(report.last_gen) : null,
           report.graph_id
         ));
-        this.updateDisplayedSessions();
+        this.reports = reports;
       },
       error: (error) => console.error('Error fetching deployments:', error)
     });
-  }
-
-  updateDisplayedSessions() {
-    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
-    const endIndex = startIndex + this.itemsPerPage;
-    this.displayedSessions = this.deploymentSessions.slice(startIndex, endIndex);
   }
 }

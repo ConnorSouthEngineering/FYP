@@ -24,11 +24,11 @@
               <img src="assets/svg/filter.svg" alt="Filter">
             </div>
           </div>
-          <div *ngIf="deploymentSessions.length == 0; else sessionTable" >
+          <div *ngIf="maxLength == 0; else sessionTable" >
             <h1>No Sessions Currently Available</h1>
           </div> 
           <div>
-            <app-pagination [totalItems]="deploymentSessions.length" [itemsPerPage]="itemsPerPage" (pageChange)="onPageChange($event)"></app-pagination>
+            <app-pagination [totalItems]="maxLength" [itemsPerPage]="itemsPerPage" (pageChange)="onPageChange($event)"></app-pagination>
           </div>
         </div>
       </div>
@@ -46,7 +46,7 @@
         <th>Report</th>
         <th>Settings</th>
       </tr>
-      <tr *ngFor="let session of displayedSessions">
+      <tr *ngFor="let session of reports">
         <td>{{session.report_name}}</td>
         <td>{{session.deployment_id}}</td>
         <td>{{session.frequency_value}} {{session.frequency_unit}}</td>

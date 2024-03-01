@@ -50,7 +50,7 @@
         <th>Age</th>
         <th>Settings</th>
       </tr>
-      <tr *ngFor="let person of displayedPersons">
+      <tr *ngFor="let person of persons">
         <td>{{person.target_name}}</td>
         <td>{{person.alt_name}}</td>
         <td>{{person.creation_date.getDate()}}/{{person.creation_date.getMonth() + 1}}/{{person.creation_date.getFullYear()}}</td>
@@ -76,7 +76,7 @@
           <th>Access</th>
           <th>Settings</th>
         </tr>
-        <tr *ngFor="let location of displayedLocations">
+        <tr *ngFor="let location of locations">
           <td>{{location.target_name}}</td>
           <td>{{location.alt_name}}</td>
           <td>{{location.creation_date}} hrs</td>
