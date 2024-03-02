@@ -14,7 +14,6 @@ $warning-colour: #eb8d25
 $danger-colour: #f44336
 
 body
-    
     font-family: $font-stack
     background: $back-colour
     background-image: url('../assets/image/generated_background.png')
@@ -27,7 +26,7 @@ body
     width: 100vw
 
 .navbar 
-    background:$box-colour
+    background: $box-colour
     font-family: $font-stack
     font-size: 24px
     color: $alt-colour
@@ -42,26 +41,39 @@ body
         display: inline
         li
             font-weight: 700
-            display: inline
-    .company
+            display: inline-block
+            position: relative
+            padding: 20px
+            &.dropdown
+                &:hover .dropdown-content
+                    display: block
+        .company
         padding-left: 80px
-        padding-right:20px
+        padding-right: 20px
         li
-            padding:20px
-    .home
-        padding-left: 0px 
-        padding-right: 50px
-        li
-            padding:20px
-    .options
-        padding: 50px
-        li
-            padding:20px
-    .profile
-        padding: 50px
-        li
-            padding:100px
-
+            padding: 20px
+        .home, .profile
+            li
+                padding: 20px
+        .options
+            padding: 50px
+            li
+                padding: 20px
+    .dropdown-content
+        display: none
+        position: absolute
+        background-color: $box-colour
+        min-width: 100px
+        box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2)
+        a
+            font-size:20px
+            color: $dark-colour
+            padding: 12px 16px
+            text-decoration: none
+            display: block
+            &:hover
+                background-color: $alt-colour
+    
 .company-logo
-  max-height: 150px 
-  max-width: 100%
+    max-height: 150px
+    max-width: 100%

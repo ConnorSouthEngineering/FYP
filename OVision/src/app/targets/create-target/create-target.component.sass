@@ -1,0 +1,121 @@
+$font-stack: sans-serif, Arial
+// Standard colours
+$back-colour: #60526F
+$box-colour: #D7C36B
+$alt-colour: #BA7489
+$dark-colour: #404040
+$light-colour: #FFFFFF
+
+// Semantic colours
+$primary-colour: #b3747c
+$info-colour: #503e66
+$success-colour: #6b9d5d
+$warning-colour: #eb8d25
+$danger-colour: #f44336
+
+div
+    border-radius: 20px
+
+.container 
+  display: flex
+  justify-content: left
+  margin-left:  150px
+  margin-right:  150px
+  
+  .column 
+    display: flex
+    flex-direction: column
+    justify-content: left
+    align-items: left
+    margin: 20px    
+    gap: 50px
+    .box
+        min-width: 500px
+        background-color: $box-colour
+        display: flex
+        flex-direction: column
+        justify-content: center
+        align-items: left
+        padding: 20px
+        padding-top: 15px
+        width: fit-content
+        p, label
+            font-weight: 70
+            font-size: 18px
+            color: $dark-colour
+            a
+                padding:5px
+                font-weight: bold
+                background: $warning-colour
+                border-radius: 10px
+        &.wide
+            min-width: 1000px
+
+.option
+    margin-top: 10px
+    display:flex
+    flex-direction: row
+    input
+        font-size: 18px
+        width: 200px
+        margin-left: 30px
+
+.target-type
+    display: flex
+    flex-direction: row
+    justify-content: left
+    align-items: center
+    gap: 20px
+    label
+        font-weight: 70
+        font-size: 18px
+        color: $dark-colour
+    select
+        width: 200px
+        height: 30px
+        font-size: 18px
+        color: $dark-colour  // This is the text color of the select box
+        background: $light-colour  // This is the background color of the select box
+        border: none
+        border-radius: 10px
+        padding-left: 10px
+        padding-right: 10px
+        &:hover
+            background: $alt-colour  // This changes the background on hover
+            color: $light-colour
+
+.title
+        background: $alt-colour
+        padding-left: 10px
+        padding-right: 10px
+        width: fit-content
+        h1
+            font-weight: 100
+            font-size: 24px
+            color: $light-colour
+    
+.table
+    margin: 0px
+    padding-top: 10px
+    display: flex
+    flex-direction: row
+    gap:10px  
+    font-size: 20px
+    color: $light-colour
+    table
+        border-collapse: collapse
+        border: none
+    td
+        height: 100px
+        text-align: center
+        color: $dark-colour
+        background:$light-colour
+    th
+        width: fit-content
+        padding:20px
+        &:nth-child(odd)
+            background:$dark-colour
+        &:nth-child(even)
+            background:$info-colour
+        &.tn
+            width:200px

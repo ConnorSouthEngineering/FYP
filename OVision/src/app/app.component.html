@@ -20,10 +20,27 @@
       </li>
     </ul>
     <ul class="options">
-      <li>Deploy</li>
-      <li routerLink="/sessions">Sessions</li>
-      <li>Targets</li>
-      <li routerLink="/reports">Reports</li>
+      <li class="dropdown dropbtn">
+        Deployments
+        <div class="dropdown-content">
+          <a  routerLink="/sessions">View</a>
+          <a routerLink="/create-deployment">Create</a>
+        </div>
+      </li>
+      <li class="dropdown dropbtn">
+        Targets
+        <div class="dropdown-content">
+          <a routerLink="/targets">View</a>
+          <a routerLink="/create-target">Create</a>
+        </div>
+      </li>
+      <li class="dropdown dropbtn">
+        Reports
+        <div class="dropdown-content">  
+          <a routerLink="/reports">View</a>
+          <a routerLink="/create-report">Create</a>
+        </div>
+      </li>
     </ul>
     <ul class="profile">
       <li>

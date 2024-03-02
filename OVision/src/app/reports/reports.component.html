@@ -12,7 +12,7 @@
       <div class="column">
         <div class="box">
           <div class="title">
-            <h1 class="title">Report History</h1>
+            <h1 class="title">Reports</h1>
           </div>
           <div class="options-bar">
             <div class="options-group search">
@@ -25,7 +25,7 @@
             </div>
           </div>
           <div *ngIf="maxLength == 0; else sessionTable" >
-            <h1>No Sessions Currently Available</h1>
+            <h1>No reports currently available</h1>
           </div> 
           <div>
             <app-pagination [totalItems]="maxLength" [itemsPerPage]="itemsPerPage" (pageChange)="onPageChange($event)"></app-pagination>

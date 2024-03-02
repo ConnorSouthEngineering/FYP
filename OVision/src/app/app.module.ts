@@ -3,6 +3,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgxEchartsModule } from 'ngx-echarts';
 import * as echarts from 'echarts';
 import { HttpClientModule } from '@angular/common/http';
+import { FormsModule } from '@angular/forms';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -15,6 +16,9 @@ import { ReportsComponent } from './reports/reports.component';
 import { LineGraphComponent } from './reports/graphs/line-graph/line-graph.component';
 import { BarGraphComponent } from './reports/graphs/bar-graph/bar-graph.component';
 import { TargetComponent } from './targets/targets.component';
+import { CreateTargetComponent } from './targets/create-target/create-target.component';
+import { CreateDeploymentComponent } from './sessions/create-deployment/create-deployment.component';
+import { DeploymentComponent } from './sessions/deployment/deployment.component';
 
 @NgModule({
   declarations: [
@@ -27,14 +31,18 @@ import { TargetComponent } from './targets/targets.component';
     ReportsComponent,
     LineGraphComponent,
     BarGraphComponent,
-    TargetComponent
+    TargetComponent,
+    CreateTargetComponent,
+    CreateDeploymentComponent,
+    DeploymentComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     NgxEchartsModule.forRoot({
       echarts,
-    }),
+    }), 
+    FormsModule,
     HttpClientModule
   ],
   providers: [],

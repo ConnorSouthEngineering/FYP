@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title></title>
+  <base href="/">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+</head>
+<body>
+    <div class="container">
+        <div class="column">
+            <div class="box">
+                <div class="title">
+                    <h1 class="title">Target Type</h1>
+                </div>
+                <p>Once confirmed the target type <a>cannot</a> be changed please choose carefully</p>
+                <div class="target-type">
+                    <label>Target Type</label>
+                    <select [(ngModel)]="selectedTargetType" (change)="onTargetTypeChange()">
+                        <option>Choose Target Type</option>
+                        <option>Location</option>
+                        <option>Person</option>
+                    </select>
+                </div>
+            </div>
+            <div *ngIf="selectedTargetType==='Person'; else elseBlock">
+                <div class="box wide">
+                    <div class="title">
+                        <h1 class="title">Target Configuration: Person</h1>
+                    </div>
+                    <div class="config">
+                        <div class="option">
+                            <label>Target Name:</label>
+                            <input type="text" [(ngModel)]="targetName">
+                        </div>
+                        <div class="option">
+                            <label>Alt Name:</label>
+                            <input type="text" [(ngModel)]="targetName">
+                        </div>
+                        <div class="option">
+                            <label>Date of Birth</label>
+                            <input type="text" [(ngModel)]="targetName">
+                        </div>
+                        <div class="option">
+                            <label>Role</label>
+                            <input type="text" [(ngModel)]="targetName">
+                        </div>>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+<ng-template #elseBlock>
+      <div *ngIf="selectedTargetType === 'Location'">
+        <div class="box wide">
+            <div class="title">
+                <h1 class="title">Target Configuration: Location</h1>
+            </div>
+            <div class="config">
+                <div class="option">
+                    <label>Target Name:</label>
+                    <input type="text" [(ngModel)]="targetName">
+                </div>
+                <div class="option">
+                    <label>Alt Name:</l abel>
+                    <input type="text" [(ngModel)]="targetName">
+                </div>
+                <div class="option">
+                    <label>Access:</label>
+                    <input type="text" [(ngModel)]="targetName">
+                </div>
+            </div>
+        </div>
+      </div>
+</ng-template>
