@@ -6,9 +6,20 @@ import { Component } from '@angular/core';
   styleUrls: ['./create-target.component.sass']
 })
 export class CreateTargetComponent {
-test: boolean = false;
-selectedTargetType: string = 'Choose Target Type';
+selectedTargetType: string = 'Location';
+
 targetName: string = '';
+altName: string = '';
+
+access: string = '';
+
+dob: string = '';
+role: string = '';
+
+createTarget(){
+  
+}
+
 onTargetTypeChange() {
   console.log('Selected Target Type:', this.selectedTargetType);
 }

@@ -1,57 +1,57 @@
-export class Target {
-    constructor(
-        public target_id:number, 
-        public target_name: string,
-        public alt_name: string,
-        public creation_date: Date,
-        public status_value: 'Active' | 'Complete' | 'Expiring' | 'Error',
-    ) {}
-}
-
-export class Person extends Target {
-    public dob: Date;
-    public role: string;
-    public age: number;
-
-    constructor(
-        target_id:number, 
-        target_name: string, 
-        alt_name: string, 
-        creation_date: Date, 
-        status_value: 'Active' | 'Complete' | 'Expiring' | 'Error', 
-        dob: Date, 
-        role: string) 
-        {
-        super(target_id, target_name, alt_name, creation_date, status_value);
-        this.dob = dob;
-        this.role = role;
-        this.age = this.getAge(dob);
+    export class Target {
+        constructor(
+            public target_id:number, 
+            public target_name: string,
+            public alt_name: string,
+            public creation_date: Date,
+            public status_value: 'Active' | 'Complete' | 'Expiring' | 'Error',
+        ) {}
     }
 
-    public getAge(dob: Date): number {
-        const today = new Date();
-        const age = today.getFullYear() - dob.getFullYear();
-        const month = today.getMonth() - dob.getMonth();
-        if (month < 0 || (month === 0 && today.getDate() < dob.getDate())) {
-            return age - 1;
+    export class Person extends Target {
+        public dob: Date;
+        public role: string;
+        public age: number;
+
+        constructor(
+            target_id:number, 
+            target_name: string, 
+            alt_name: string, 
+            creation_date: Date, 
+            status_value: 'Active' | 'Complete' | 'Expiring' | 'Error', 
+            dob: Date, 
+            role: string) 
+            {
+            super(target_id, target_name, alt_name, creation_date, status_value);
+            this.dob = dob;
+            this.role = role;
+            this.age = this.getAge(dob);
         }
-        return age;
+
+        public getAge(dob: Date): number {
+            const today = new Date();
+            const age = today.getFullYear() - dob.getFullYear();
+            const month = today.getMonth() - dob.getMonth();
+            if (month < 0 || (month === 0 && today.getDate() < dob.getDate())) {
+                return age - 1;
+            }
+            return age;
+        }
+
     }
 
-}
-
-export class Location extends Target {
-    constructor(
-        target_id:number,
-        target_name: string,
-        alt_name: string,
-        creation_date: Date,
-        status_value: 'Active' | 'Complete' | 'Expiring' | 'Error',
-        public access: 'public' | 'private') 
-        {
-        super(target_id,target_name, alt_name, creation_date, status_value);
+    export class Location extends Target {
+        constructor(
+            target_id:number,
+            target_name: string,
+            alt_name: string,
+            creation_date: Date,
+            status_value: 'Active' | 'Complete' | 'Expiring' | 'Error',
+            public access: 'public' | 'private') 
+            {
+            super(target_id,target_name, alt_name, creation_date, status_value);
+        }
     }
-}
 
 export class Deployment {
     constructor(

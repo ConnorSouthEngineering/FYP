@@ -30,22 +30,21 @@
                         <h1 class="title">Target Configuration: Person</h1>
                     </div>
                     <div class="config">
-                        <div class="option">
+                        <div class="column">
                             <label>Target Name:</label>
-                            <input type="text" [(ngModel)]="targetName">
-                        </div>
-                        <div class="option">
                             <label>Alt Name:</label>
-                            <input type="text" [(ngModel)]="targetName">
+                            <label>Date of Birth:</label>
+                            <label>Role:</label>
                         </div>
-                        <div class="option">
-                            <label>Date of Birth</label>
+                        <div class="column">
                             <input type="text" [(ngModel)]="targetName">
+                            <input type="text" [(ngModel)]="altName">
+                            <input type="text" [(ngModel)]="dob">
+                            <input type="text" [(ngModel)]="role">
                         </div>
-                        <div class="option">
-                            <label>Role</label>
-                            <input type="text" [(ngModel)]="targetName">
-                        </div>>
+                        <div class="column">
+                            <button></button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -60,17 +59,22 @@
                 <h1 class="title">Target Configuration: Location</h1>
             </div>
             <div class="config">
-                <div class="option">
+                <div class="column">
                     <label>Target Name:</label>
-                    <input type="text" [(ngModel)]="targetName">
-                </div>
-                <div class="option">
-                    <label>Alt Name:</l abel>
-                    <input type="text" [(ngModel)]="targetName">
-                </div>
-                <div class="option">
+                    <label>Alt Name:</label>
                     <label>Access:</label>
+                </div>
+                <div class="column">
                     <input type="text" [(ngModel)]="targetName">
+                    <input type="text" [(ngModel)]="altName">
+                    <input type="text" [(ngModel)]="access">
+                </div>
+                <div class="column">
+                    <img>
+                    <button class="image">Upload Image</button>
+                </div>
+                <div class="column">
+                    <button (click)="createTarget">Submit</button>
                 </div>
             </div>
         </div>
