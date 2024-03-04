@@ -37,13 +37,17 @@
                             <label>Role:</label>
                         </div>
                         <div class="column">
-                            <input type="text" [(ngModel)]="targetName">
-                            <input type="text" [(ngModel)]="altName">
-                            <input type="text" [(ngModel)]="dob">
+                            <input type="text" [(ngModel)]="target_name">
+                            <input type="text" [(ngModel)]="alt_name">
+                            <input type="text" [(ngModel)]="dob_entry">
                             <input type="text" [(ngModel)]="role">
                         </div>
                         <div class="column">
-                            <button></button>
+                            <img>
+                            <button class="image">Upload Image</button>
+                        </div>
+                        <div class="column">
+                            <button (click)="createPerson()">Submit</button>
                         </div>
                     </div>
                 </div>
@@ -65,8 +69,8 @@
                     <label>Access:</label>
                 </div>
                 <div class="column">
-                    <input type="text" [(ngModel)]="targetName">
-                    <input type="text" [(ngModel)]="altName">
+                    <input type="text" [(ngModel)]="target_name">
+                    <input type="text" [(ngModel)]="alt_name">
                     <input type="text" [(ngModel)]="access">
                 </div>
                 <div class="column">
@@ -74,7 +78,7 @@
                     <button class="image">Upload Image</button>
                 </div>
                 <div class="column">
-                    <button (click)="createTarget">Submit</button>
+                    <button (click)="createLocation()">Submit</button>
                 </div>
             </div>
         </div>

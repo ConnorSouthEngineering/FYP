@@ -4,7 +4,7 @@
             public target_name: string,
             public alt_name: string,
             public creation_date: Date,
-            public status_value: 'Active' | 'Complete' | 'Expiring' | 'Error',
+            public status_value: 'Active' | 'Complete' | 'Expiring' | 'Error' | 'New',
         ) {}
     }
 
@@ -18,7 +18,7 @@
             target_name: string, 
             alt_name: string, 
             creation_date: Date, 
-            status_value: 'Active' | 'Complete' | 'Expiring' | 'Error', 
+            status_value: 'Active' | 'Complete' | 'Expiring' | 'Error' | 'New',
             dob: Date, 
             role: string) 
             {
@@ -46,8 +46,8 @@
             target_name: string,
             alt_name: string,
             creation_date: Date,
-            status_value: 'Active' | 'Complete' | 'Expiring' | 'Error',
-            public access: 'public' | 'private') 
+            status_value: 'Active' | 'Complete' | 'Expiring' | 'Error' | 'New',
+            public access: 'public' | 'private' | null)     
             {
             super(target_id,target_name, alt_name, creation_date, status_value);
         }

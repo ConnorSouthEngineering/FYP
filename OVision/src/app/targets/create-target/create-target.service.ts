@@ -1,23 +1,21 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import {Target} from '../../../shared/models/Entities'
+import { HttpClient } from '@angular/common/http';
+import { Person, Location } from '../../../shared/models/Entities'
 
 @Injectable({
   providedIn: 'root'
 })
 export class CreateTargetService {
   constructor(private http: HttpClient) { }
+  apiUrl = 'http://localhost:3000/targets/create';
 
+  postPerson(person: Person) {
+    const url = `${this.apiUrl}/person`;
+    return this.http.post(url, person);
+  }
 
-  createTargetService(target: Target): Observable<Target> {
-
-    const url = 'http://localhost:3000/targets/create';
-    new 
-    const params = new HttpParams()
-      .set('itemLimit', itemLimit.toString())
-      .set('currentPage', currentPage.toString());
-
-    return this.http.post<target>(url, { params });
+  postLocation(location: Location) {
+    const url = `${this.apiUrl}/location`;
+    return this.http.post(url, location);
   }
 }

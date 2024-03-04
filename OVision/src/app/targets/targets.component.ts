@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { GetTargetService } from './get-targets.service';
 import { GetMapService } from '../passive/get-maps.service';
-import { Location, Person, Target } from 'src/shared/models/Entities';
+import { Location, Person } from 'src/shared/models/Entities';
 
 @Component({
   selector: 'app-targets',
