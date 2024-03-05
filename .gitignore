@@ -1,5 +1,4 @@
-NVision/venv/
-NVision/app/sources/
-NVision/app/processing*
-NVision/model_tasks/*
+master/NVision/app/sources/
+master/NVision/app/processing*
+master/NVision/model_tasks/*
 Excess
