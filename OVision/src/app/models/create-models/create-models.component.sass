@@ -80,14 +80,14 @@ select
         color: $light-colour
 
 .title
-        background: $alt-colour
-        padding-left: 10px
-        padding-right: 10px
-        width: fit-content
-        h1
-            font-weight: 100
-            font-size: 24px
-            color: $light-colour
+    background: $alt-colour
+    padding-left: 10px
+    padding-right: 10px
+    width: fit-content
+    h1
+        font-weight: 100
+        font-size: 24px
+        color: $light-colour
 
 ul      
     list-style-type: disc  
@@ -99,6 +99,24 @@ ul
         position: relative
         padding-left: 20px
         padding-top: 10px
+
+.status
+    h1
+        font-weight: 700
+        font-size: 24px
+        color: $light-colour
+        b
+            padding:5px
+            font-weight: bold
+            background: $info-colour
+            border-radius: 10px
+            
+
+.classConfig
+    ul
+        margin-top: -25px
+        padding-top: 5px
+        padding-bottom:-20px
 
 .advanced
     display: flex
@@ -118,6 +136,8 @@ ul
         margin-left: 400px
         width: 125px
         height: 40px
+        &.submit
+            margin-left: 20px
         &:disabled
             background-color: $dark-colour
             color: $light-colour
@@ -126,6 +146,26 @@ ul
             margin-left: 400px
             width: 125px
             height: 40px
+
+.name
+    display: flex
+    flex-direction: row
+    label
+        margin: 0px
+        padding: 5px 5px
+    input
+        margin: 0px
+        padding: 5px 5px 
+        border-radius: 20px 
+        border: 3px solid $light-colour
+        outline: none  
+        box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1)  
+        font-size: 18px  
+        height: 15px
+        transition: border-color 0.3s, box-shadow 0.3s  
+        &:focus
+            border-color: $alt-colour
+            box-shadow: 0px 0px 8px rgba(179, 116, 124, 0.6) 
 
 .config
     display: flex
@@ -142,11 +182,39 @@ ul
         box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1)  
         font-size: 18px  
         height: 15px
-        width: 20px
+        width: 40px
         transition: border-color 0.3s, box-shadow 0.3s  
         &:focus
             border-color: $alt-colour
             box-shadow: 0px 0px 8px rgba(179, 116, 124, 0.6)  
+
+.classes
+    margin-top: 15px
+    margin-left: 20px
+    button
+        width: 0
+        height: 0
+        border-left: 5px solid transparent
+        border-right: 5px solid transparent
+        border-top: 8px solid black // Change the color as needed
+        background: none
+        cursor: pointer
+        margin-right: 8px // Adjust space between the triangle and the label
+        border-radius: 0 // Ensures the button is triangular
+        padding: 0
+        &:disabled
+            background-color: $dark-colour
+            color: $light-colour
+            border-radius: 20px
+            font-size: 18px
+            width: 125px
+            height: 40px
+    span
+        cursor: pointer
+        color: $dark-colour
+        font-size: 22px
+        font-weight: 700
+
 
 input[type='number'] 
 

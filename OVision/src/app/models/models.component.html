@@ -42,12 +42,16 @@
         <th>Configuration Type</th>
         <th>Creation Date</th>
         <th>Location</th>
+        <th>Information</th>
       </tr>
       <tr *ngFor="let model of models">
         <td>{{model.model_name}}</td>
         <td>{{mapModelConfiguration(model)}}</td>
         <td>{{model.creation_date.getDate()}}/{{model.creation_date.getMonth() + 1}}/{{model.creation_date.getFullYear()}}</td>
-        <td>{{model.location_name}}</td>      
+        <td>{{model.location_name}}</td>  
+        <td>
+          <img src="assets/svg/info.svg" alt="Information Icon">
+        </td>    
       </tr>
     </table>
   </div>

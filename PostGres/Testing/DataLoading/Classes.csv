@@ -1,8 +1,5 @@
 class_id,class_name,data_count
-1,chopping,542
-2,cooking,234
-3,walking,553
-4,running,319
-5,jumping,542
-6,drinking,187
-7,eating,200
+1,cooking,542
+2,eating,234
+3,pouring,553
+4,drinking,319

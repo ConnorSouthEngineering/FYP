@@ -9,7 +9,7 @@ export class GetCategoriesService {
   constructor(private http: HttpClient) { }
 
 
-  getCategoriesService(): Observable<any[]> {
+  getCategories(): Observable<any[]> {
 
     const url = 'http://localhost:3000/models/categories/';
 

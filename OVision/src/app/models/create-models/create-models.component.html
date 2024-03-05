@@ -14,8 +14,16 @@
                 <div class="title" >
                     <h1 class="title">Model Configuration</h1>
                 </div>
+                <div class="name">
+                    <div class="column">
+                        <label>Model Name:</label>
+                    </div>
+                    <div class="column">
+                        <input type="text" [(ngModel)]="modelName">
+                    </div>
+                </div>
                 <p>The below selection box provides all the current supported configuration options.</p>
-                <div class="target-type"*ngIf="availableConfig.length===0; else configurationOptions">
+                <div class="target-type"*ngIf="configMap.length===0; else configurationOptions">
                     <label >Configuration Option</label>
                     <select [(ngModel)]="selectedConfig" (change)="onConfigChange()" >
                         <option>No models available</option>
@@ -25,7 +33,7 @@
                 <div class="advanced">
                     <label>Advanced Settings</label>
                     <input [(ngModel)]="advancedSettings" type="checkbox">
-                    <button [disabled]="buttonStatus" (click)="getClasses()">Next</button>
+                    <button [disabled]="nextButtonStatus" (click)="getClasses()">Next</button>
                 </div>
             </div>
         </div>
@@ -76,7 +84,7 @@
     <div class="target-type">
         <label>Configuration Option</label>
         <select [(ngModel)]="selectedConfig" (change)="onConfigChange()">
-            <option *ngFor="let configuration of availableConfig" [ngValue]="configuration">{{configuration.config_id}}:  {{configuration.config_name}}</option>
+            <option *ngFor="let configuration of configMap" [ngValue]="configuration">{{configuration.config_id}}:  {{configuration.config_name}}</option>
         </select>
     </div>
 </ng-template>
@@ -92,6 +100,8 @@
                     <li>Areas with sceneary that doesnt vary</li>
                     <li>Few classes of interest</li>
                 </ul>
+            </div>
+            <div class="box" *ngIf="phase1; else classConfig">
             </div>
 </ng-template>
 <ng-template #selectedConfigAccuracy>
@@ -142,8 +152,36 @@
         <div class="title">
             <h1 class="title">Class Selection</h1>
         </div>
-        <div>
-            
+        <div class="classes" *ngFor="let category of categories; let i = index">
+            <span>{{category}}</span>
+            <button (click)="categoriesExpanded[i] = !categoriesExpanded[i]"></button>
+            <div *ngIf="categoriesExpanded[i]">
+              <div *ngFor="let classItem of selectValues(category)">
+                <input type="checkbox" id="class-{{classItem}}" (change)="toggleClassSelection(classItem, $event)">
+                <label for="class-{{classItem}}">{{classItem}}</label>
+              </div>
+            </div>
+          </div>  
+        <div class="advanced">
+            <button [disabled]="previousButtonStatus" (click)="returnToModelConfig()">Go Back</button>
+            <button class="submit" [disabled]="nextButtonStatus" (click)="submitTask()">Submit</button>
         </div>
+    </div>
+    <div class="box" *ngIf="this.taskRunning">
+        <div class="title">
+            <h1 class="title">Task Submitted</h1>
+        </div>
+        <div class="status">
+            <p>Please wait for your task to complete</p>
+            <h1>Current task status: <b>{{this.submittedTask?.status_value}}</b></h1>
+        </div>
+    </div>
+</ng-template>
+<ng-template #classConfig>
+    <p><b>Classes:</b></p>
+    <div class="classConfig">
+        <ul *ngFor="let classes of chosenClasses">
+            <li>{{classes}}</li>
+        </ul>
     </div>
 </ng-template>

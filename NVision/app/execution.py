@@ -7,7 +7,9 @@ from modules.task_orders import update_task_status, create_model_entry
 
 async def create_model(request):
     body = await request.json()
-    task_id = body['task_id']
+    print(body)
+    task_id = body[0]['insert_model_task']
+    print(task_id)
     update_task_status(task_id,"gathering")
     image_tag = "cudatf"  
     files_task = asyncio.create_task(pull_files(task_id))
@@ -39,14 +41,16 @@ async def request_model(request):
     model_id = body['model_id']
 
 async def server_up():
+    server = '0.0.0.0'
+    port = 8080
     app = web.Application()
     app.add_routes([web.post('/model/create', create_model)])
     app.add_routes([web.post('/model/request', request_model)])
     runner = web.AppRunner(app)
     await runner.setup()
-    site = web.TCPSite(runner, 'localhost', 8080)
+    site = web.TCPSite(runner, server, port)
     await site.start()
-    print("Server ready to recieve model requests http://localhost:8080")
+    print(f"Server ready to recieve model requests http://{server}:{port}")
 
 async def main():
     await server_up()

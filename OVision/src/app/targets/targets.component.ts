@@ -57,26 +57,29 @@ export class TargetComponent implements OnInit {
         this.persons = [];
         this.locations = [];
         data.flatMap(item => item.get_latest_targets).forEach(target => {
-          if (target.dob !== null) {
-            console.log(target.target_id)
-            this.persons.push(new Person(
-              target.target_id,
-              target.target_name,
-              target.alt_name,
-              new Date(target.creation_date),
-              target.status_value,
-              new Date(target.dob),
-              target.role
-            ));
-          } else {
-            this.locations.push(new Location(
-              target.target_id,
-              target.target_name,
-              target.alt_name,
-              new Date(target.creation_date),
-              target.status_value,
-              target.access
-            ));
+        if(target){
+            if (target.dob !== null) {
+              console.log(target.target_id)
+              this.persons.push(new Person(
+                target.target_id,
+                target.target_name,
+                target.alt_name,
+                new Date(target.creation_date),
+                target.status_value,
+                new Date(target.dob),
+                target.role
+              ));
+            } 
+            else {
+              this.locations.push(new Location(
+                target.target_id,
+                target.target_name,
+                target.alt_name,
+                new Date(target.creation_date),
+                target.status_value,
+                target.access
+              ));
+            }
           }
         });
       },

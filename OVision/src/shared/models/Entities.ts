@@ -52,27 +52,9 @@
             super(target_id,target_name, alt_name, creation_date, status_value);
         }
     }
-
-    export class Model {
+    
+    export class BaseModelConfig {
         constructor(
-            public model_id: number,
-            public model_name: string,
-            public epochs: number,
-            public num_frames: number,
-            public batch_size: number,
-            public creation_date: Date,
-            public train: number,
-            public test: number,
-            public verification: number,
-            public shuffle_size: number,
-            public location_name: string
-        ){}
-    }
-
-    export class ModelConfig {
-        constructor(
-            public config_id: number,
-            public config_name: string,
             public epochs: number,
             public num_frames: number,
             public batch_size: number,
@@ -80,7 +62,61 @@
             public test: number,
             public verification: number,
             public shuffle_size: number
-        ){}
+        ) {}
+    }
+    
+    export class Model extends BaseModelConfig {
+        constructor(
+            public model_id: number,
+            public model_name: string,
+            epochs: number,
+            num_frames: number,
+            batch_size: number,
+            public creation_date: Date,
+            train: number,
+            test: number,
+            verification: number,
+            shuffle_size: number,
+            public location_name: string
+        ) {
+            super(epochs, num_frames, batch_size, train, test, verification, shuffle_size);
+        }
+    }
+
+    export class ModelConfig extends BaseModelConfig {
+        constructor(
+            public config_id: number,
+            public config_name: string,
+            epochs: number,
+            num_frames: number,
+            batch_size: number,
+            train: number,
+            test: number,
+            verification: number,
+            shuffle_size: number
+        ) {
+            super(epochs, num_frames, batch_size, train, test, verification, shuffle_size);
+        }
+    }
+    
+    export class Task extends BaseModelConfig {
+        constructor(
+            public task_id: number,
+            public model_name: string,
+            public creation_date: Date,
+            public status_value: 'queue' | 'gathering' | 'training' | 'trained' | 'failed',
+            public classes: number[],
+            public sources: number[],
+            epochs: number,
+            num_frames: number,
+            batch_size: number,
+            train: number,
+            test: number,
+            verification: number,
+            shuffle_size: number
+        ) {
+            super(epochs, num_frames, batch_size, train, test, verification, shuffle_size);
+        }
     }
 
 export class Deployment {

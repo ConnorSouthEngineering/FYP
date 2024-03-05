@@ -12,7 +12,7 @@ export class GetMapService {
   private countMapUrl = 'http://localhost:3000/maps/counts';
   private configurationMapUrl = 'http://localhost:3000/maps/configurations';
   private categoryMapUrl = 'http://localhost:3000/maps/categories';
-  private refreshInterval = 30 * 60 * 1000;
+  private refreshInterval = 30 * 60 * 10000;
 
   constructor(private http: HttpClient) {
     console.log('MapService initialized'); 
