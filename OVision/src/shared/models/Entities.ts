@@ -53,6 +53,36 @@
         }
     }
 
+    export class Model {
+        constructor(
+            public model_id: number,
+            public model_name: string,
+            public epochs: number,
+            public num_frames: number,
+            public batch_size: number,
+            public creation_date: Date,
+            public train: number,
+            public test: number,
+            public verification: number,
+            public shuffle_size: number,
+            public location_name: string
+        ){}
+    }
+
+    export class ModelConfig {
+        constructor(
+            public config_id: number,
+            public config_name: string,
+            public epochs: number,
+            public num_frames: number,
+            public batch_size: number,
+            public train: number,
+            public test: number,
+            public verification: number,
+            public shuffle_size: number
+        ){}
+    }
+
 export class Deployment {
     constructor(
         public deployment_id: string,

@@ -17,7 +17,7 @@
                 <p>Once confirmed the target type <a>cannot</a> be changed please choose carefully</p>
                 <div class="target-type">
                     <label>Target Type</label>
-                    <select [(ngModel)]="selectedTargetType" (change)="onTargetTypeChange()">
+                    <select [(ngModel)]="selectedTargetType">
                         <option>Choose Target Type</option>
                         <option>Location</option>
                         <option>Person</option>
@@ -71,7 +71,10 @@
                 <div class="column">
                     <input type="text" [(ngModel)]="target_name">
                     <input type="text" [(ngModel)]="alt_name">
-                    <input type="text" [(ngModel)]="access">
+                    <select [(ngModel)]="access">
+                        <option>private</option>
+                        <option>public</option>
+                    </select>
                 </div>
                 <div class="column">
                     <img>

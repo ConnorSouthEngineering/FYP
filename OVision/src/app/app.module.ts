@@ -19,6 +19,8 @@ import { TargetComponent } from './targets/targets.component';
 import { CreateTargetComponent } from './targets/create-target/create-target.component';
 import { CreateDeploymentComponent } from './sessions/create-deployment/create-deployment.component';
 import { DeploymentComponent } from './sessions/deployment/deployment.component';
+import { ModelsComponent } from './models/models.component';
+import { CreateModelsComponent } from './models/create-models/create-models.component';
 
 @NgModule({
   declarations: [
@@ -34,7 +36,9 @@ import { DeploymentComponent } from './sessions/deployment/deployment.component'
     TargetComponent,
     CreateTargetComponent,
     CreateDeploymentComponent,
-    DeploymentComponent
+    DeploymentComponent,
+    ModelsComponent,
+    CreateModelsComponent
   ],
   imports: [
     BrowserModule,

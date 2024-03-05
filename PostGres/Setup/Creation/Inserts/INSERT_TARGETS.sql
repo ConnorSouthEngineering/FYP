@@ -6,7 +6,6 @@ CREATE OR REPLACE FUNCTION INSERT_TARGETS(
     _status_value VARCHAR,
     _access VARCHAR,
     _dob DATE,
-    _age INT,
     _role VARCHAR
 )
 RETURNS INT AS $$
@@ -14,8 +13,8 @@ DECLARE
     new_target_id INT;
 BEGIN
     SET SCHEMA 'vision_data';
-    INSERT INTO targets(target_name, alt_name, creation_date, status_value, access, dob, age, role)
-    VALUES (_target_name, _alt_name, _creation_date, _status_value, _access, _dob, _age, _role)
+    INSERT INTO targets(target_name, alt_name, creation_date, status_value, access, dob, role)
+    VALUES (_target_name, _alt_name, _creation_date, _status_value, _access, _dob, _role)
     RETURNING target_id INTO new_target_id;
     
     RETURN new_target_id;

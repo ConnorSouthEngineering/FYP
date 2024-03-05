@@ -48,47 +48,11 @@ div
                 font-weight: bold
                 background: $warning-colour
                 border-radius: 10px
+            b
+                padding:5px
+                font-weight: bold
         &.wide
             min-width: 1000px
-
-
-.config
-    display: flex
-    flex-direction: row
-    label
-        margin: 0px
-        padding: 5px
-    input
-        margin: 0px
-        padding: 5px 5px 
-        border-radius: 20px 
-        border: 3px solid $light-colour
-        outline: none  
-        box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1)  
-        font-size: 18px  
-        height: 15px
-        transition: border-color 0.3s, box-shadow 0.3s  
-        &:focus
-            border-color: $alt-colour
-            box-shadow: 0px 0px 8px rgba(179, 116, 124, 0.6)  
-    button
-        background-color: $alt-colour
-        color: $light-colour
-        border-radius: 20px
-        font-size: 18px
-        margin-top: 160px
-        margin-left: 120px
-        width: 125px
-        height: 40px
-        &.image
-            margin-left: 20px
-            margin-top: -30px
-            width: 175px
-            height: 30px
-    img
-        width: 212px
-        height: 144px
-
 
 .target-type
     display: flex
@@ -124,29 +88,74 @@ select
             font-weight: 100
             font-size: 24px
             color: $light-colour
-    
-.table
-    margin: 0px
-    padding-top: 10px
+
+ul      
+    list-style-type: disc  
+    padding-left: 20px
+    flex-direction: column
+    color: $dark-colour
+    li
+        font-weight: 600
+        position: relative
+        padding-left: 20px
+        padding-top: 10px
+
+.advanced
     display: flex
     flex-direction: row
-    gap:10px  
-    font-size: 20px
-    color: $light-colour
-    table
-        border-collapse: collapse
-        border: none
-    td
-        height: 100px
-        text-align: center
+    justify-content: left
+    align-items: center
+    gap: 20px
+    label
+        font-weight: 70
+        font-size: 18px
         color: $dark-colour
-        background:$light-colour
-    th
-        width: fit-content
-        padding:20px
-        &:nth-child(odd)
-            background:$dark-colour
-        &:nth-child(even)
-            background:$info-colour
-        &.tn
-            width:200px
+    button
+        background-color: $alt-colour
+        color: $light-colour
+        border-radius: 20px
+        font-size: 18px
+        margin-left: 400px
+        width: 125px
+        height: 40px
+        &:disabled
+            background-color: $dark-colour
+            color: $light-colour
+            border-radius: 20px
+            font-size: 18px
+            margin-left: 400px
+            width: 125px
+            height: 40px
+
+.config
+    display: flex
+    flex-direction: row
+    label
+        margin: 0px
+        padding: 5px
+    input
+        margin: 0px
+        padding: 5px 10px 
+        border-radius: 20px 
+        border: 3px solid $light-colour
+        outline: none  
+        box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1)  
+        font-size: 18px  
+        height: 15px
+        width: 20px
+        transition: border-color 0.3s, box-shadow 0.3s  
+        &:focus
+            border-color: $alt-colour
+            box-shadow: 0px 0px 8px rgba(179, 116, 124, 0.6)  
+
+input[type='number'] 
+
+  &::-webkit-inner-spin-button,
+  &::-webkit-outer-spin-button 
+    -webkit-appearance: none
+    margin: 0
+
+  &::-moz-focus-inner 
+    border: 0
+  
+  -moz-appearance: textfield

@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title></title>
+  <base href="/">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+</head>
+<body>
+    <div class="container">
+      <div class="column">
+        <div class="box">
+          <div class="title">
+            <h1 class="title">Models</h1>
+          </div>
+          <div class="options-bar">
+            <div class="options-group search">
+              <img src="assets/svg/search.svg" alt="Search">
+              <p>Search</p>
+            </div>
+            <div class="options-group filter">
+              <p>Filter</p>
+              <img src="assets/svg/filter.svg" alt="Filter">
+            </div>
+          </div>
+          <div *ngIf="models.length == 0; else sessionTable" >
+            <h1>No Sessions Currently Available</h1>
+          </div> 
+          <div>
+            <app-pagination [totalItems]="maxLength" [itemsPerPage]="itemsPerPage" (pageChange)="onPageChange($event)"></app-pagination>
+          </div>
+        </div>
+      </div>
+    </div>
+</body>
+<ng-template #sessionTable>
+  <div class="table">
+    <table>
+      <tr>
+        <th>Model Name</th>
+        <th>Configuration Type</th>
+        <th>Creation Date</th>
+        <th>Location</th>
+      </tr>
+      <tr *ngFor="let model of models">
+        <td>{{model.model_name}}</td>
+        <td>{{mapModelConfiguration(model)}}</td>
+        <td>{{model.creation_date.getDate()}}/{{model.creation_date.getMonth() + 1}}/{{model.creation_date.getFullYear()}}</td>
+        <td>{{model.location_name}}</td>      
+      </tr>
+    </table>
+  </div>
+</ng-template>
+</html>

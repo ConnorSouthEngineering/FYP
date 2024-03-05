@@ -10,6 +10,8 @@ export class GetMapService {
   private classMapUrl = 'http://localhost:3000/maps/class';
   private graphMapUrl = 'http://localhost:3000/maps/graphs';
   private countMapUrl = 'http://localhost:3000/maps/counts';
+  private configurationMapUrl = 'http://localhost:3000/maps/configurations';
+  private categoryMapUrl = 'http://localhost:3000/maps/categories';
   private refreshInterval = 30 * 60 * 1000;
 
   constructor(private http: HttpClient) {
@@ -54,6 +56,22 @@ export class GetMapService {
         return this.fetchAndCache(this.countMapUrl, 'countMap');
       })
     ).subscribe();
+
+    interval(this.refreshInterval).pipe(
+      startWith(0),
+      switchMap(() => {
+        console.log('Refreshing configurationMap data'); 
+        return this.fetchAndCache(this.configurationMapUrl, 'configurationMap');
+      })
+    ).subscribe();
+
+    interval(this.refreshInterval).pipe(
+      startWith(0),
+      switchMap(() => {
+        console.log('Refreshing categoryMap data'); 
+        return this.fetchAndCache(this.categoryMapUrl, 'categoryMap');
+      })
+    ).subscribe();
   }
 
   fetchClassMap(): Observable<any> {
@@ -64,6 +82,29 @@ export class GetMapService {
     } else {
       console.log('Fetching classMap from server');
       return this.fetchAndCache(this.classMapUrl, 'classMap');
+    }
+  }
+
+  fetchCategoryMap(): Observable<any> {
+    const cachedData = localStorage.getItem('categoryMap');
+    if (cachedData) {
+      console.log('Fetching categoryMap from cache'); 
+      return of(JSON.parse(cachedData));
+    } else {
+      console.log('Fetching classMap from server');
+      return this.fetchAndCache(this.categoryMapUrl, 'categoryMap');
+    }
+  }
+  
+
+  fetchConfigurationMap(): Observable<any> {
+    const cachedData = localStorage.getItem('configurationMap');
+    if (cachedData) {
+      console.log('Fetching configurationMap from cache'); 
+      return of(JSON.parse(cachedData));
+    } else {
+      console.log('Fetching configurationMap from server');
+      return this.fetchAndCache(this.configurationMapUrl, 'configurationMap');
     }
   }
 

@@ -74,6 +74,18 @@ CREATE TABLE ClassCategories(
     category_id INT REFERENCES Categories(category_id)
 );
 
+CREATE TABLE ModelConfiguration(
+    config_id BIGSERIAL PRIMARY KEY,
+    config_name VARCHAR NOT NULL,
+    epochs INT NOT NULL,
+    num_frames INT NOT NULL,
+    shuffle_size INT NOT NULL,
+    batch_size INT NOT NULL,
+    train INT NOT NULL,
+    test INT NOT NULL,
+    verification INT NOT NULL
+);
+
 CREATE TABLE Models(
     model_id BIGSERIAL PRIMARY KEY,
     model_name VARCHAR NOT NULL,

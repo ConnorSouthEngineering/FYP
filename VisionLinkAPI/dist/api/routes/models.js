@@ -16,5 +16,27 @@ router.post('/create', (req, res, next) => {
         res.status(500).json({ error: err });
     });
 });
+router.get('/categories', (req, res, next) => {
+    const params = [];
+    executeF("vision_data", "get_categorised_classes", params)
+        .then(result => {
+        res.status(200).json(result);
+    })
+        .catch(err => {
+        res.status(500).json({ error: err });
+    });
+});
+router.get('/', (req, res, next) => {
+    const _item_limit = parseInt(req.query.itemLimit, 10) || 10;
+    const _current_page = parseInt(req.query.currentPage, 10) || 1;
+    const params = [_item_limit, _current_page];
+    executeF("vision_data", "get_latest_models", params)
+        .then(result => {
+        res.status(200).json(result);
+    })
+        .catch(err => {
+        res.status(500).json({ error: err });
+    });
+});
 module.exports = router;
 //# sourceMappingURL=models.js.map

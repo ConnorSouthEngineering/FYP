@@ -36,10 +36,10 @@ export class TargetComponent implements OnInit {
       console.log(countMaps[0])
       const countMap = countMaps[0]?.get_count_map;
       if (countMap) {
-        console.log(countMap);
-        console.log(countMap['target_count']);
+        console.log("Map:"+countMap);
+        console.log("Max Length Map:"+countMap['target_count']);
         this.maxLength = countMap['target_count'];
-        console.log(this.maxLength)
+        console.log("Max Length Saved:"+this.maxLength)
         this.cdr.detectChanges();
       } else {
         console.log('Count not retrieved');

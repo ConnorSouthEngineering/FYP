@@ -80,7 +80,7 @@
         <tr *ngFor="let location of locations">
           <td>{{location.target_name}}</td>
           <td>{{location.alt_name}}</td>
-          <td>{{location.creation_date}} hrs</td>
+          <td>{{location.creation_date.getDate()}}/{{location.creation_date.getMonth() + 1}}/{{location.creation_date.getFullYear()}}</td>
           <td>{{location.status_value}}</td>
           <td>{{location.access}}</td>
           <td>

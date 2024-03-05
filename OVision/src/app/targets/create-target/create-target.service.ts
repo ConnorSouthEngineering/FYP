@@ -10,12 +10,12 @@ export class CreateTargetService {
   apiUrl = 'http://localhost:3000/targets/create';
 
   postPerson(person: Person) {
-    const url = `${this.apiUrl}/person`;
+    const url = `${this.apiUrl}`;
     return this.http.post(url, person);
   }
 
   postLocation(location: Location) {
-    const url = `${this.apiUrl}/location`;
+    const url = `${this.apiUrl}`;
     return this.http.post(url, location);
   }
 }
