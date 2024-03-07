@@ -45,19 +45,23 @@ def collect_model_configuration(model_path):
     loaded_model = tf.saved_model.load(model_path)
     serving_default = loaded_model.signatures['serving_default']
 
-    for input_name, input_tensor in loaded_model.structured_input_signature[1].items():
-        model_input_name = input_name
-        model_input_shape = input_tensor.shape
-        model_input_dtype = input_tensor.dtype
+    ##Pulls two items from structured_input_signature, 
+    ##1) Name of the tensor
+    ##2) The TensorSpec object -- contains shape, dtype and name
+    for input_name, input_tensor in serving_default.structured_input_signature[1].items():
+            model_input_name = input_name
+            model_input_shape = input_tensor.shape
+            model_input_dtype = input_tensor.dtype
 
     for output_name, output_tensor in serving_default.structured_outputs.items():
-        model_output_name = output_name
-        model_output_shape = output_tensor.shape
-        model_output_dtype = output_tensor.dtype
+            model_output_name = output_name
+            model_output_shape = output_tensor.shape
+            model_output_dtype = output_tensor.dtype
+
     return model_input_name, model_input_dtype, model_input_shape, model_output_name, model_output_dtype, model_output_shape
 
-def write_config(config_lines, model_name, folder_path):
-    with open(f"{folder_path}/{model_name}.pbtxt", "w") as file:
+def write_config(config_lines, folder_path):
+    with open(f"{folder_path}/conf.pbtxt", "w") as file:
         for line in config_lines:
             file.write(line + "\n")
     print("Config file created")
@@ -65,6 +69,7 @@ def write_config(config_lines, model_name, folder_path):
 
 def create_triton_config(model_name, folder_path):
     model_path = os.path.join(folder_path,model_name)
+    print(model_path)
     input_name,input_dtype,input_shape,output_name,output_dtype,output_shape = collect_model_configuration(model_path)
 
     type_mapping = {
@@ -103,7 +108,7 @@ def create_triton_config(model_name, folder_path):
         f"  }}",
         "]",
     ]
-    write_config(config_lines, model_name, folder_path)
+    write_config(config_lines, folder_path)
     return
 
 def generate_training_config(labels, model_name, folder_path, epochs, num_frames, shuffle_size, batch_size, height, width):

@@ -7,7 +7,7 @@ import os
 
 from load_data import FrameGenerator
 from visualise_results import plot_history, get_actual_predicted_labels, plot_confusion_matrix
-from create_config import generate_training_config, generate_triton_config, export_classes
+from create_config import generate_training_config, create_triton_config
 
 
 def extract_data(folder_path, num_frames):
@@ -103,7 +103,7 @@ def main():
         height = 224
         width = 224
         
-        #folder_path = "/home/connor/Desktop/FYP/master/NVision/model_tasks/Testing_Folder"
+        #folder_path = "/home/connor/Desktop/FYP/master/NVision/model_tasks/new_test_2024-03-07-22-15"
         folder_path = "/mnt"
 
         train_ds, val_ds, test_ds = extract_data(folder_path, num_frames)
@@ -143,8 +143,9 @@ def main():
 
         model.save(os.path.join(folder_path, model_name), save_format='tf')
         
+        create_triton_config(model_name, folder_path)
         generate_training_config(labels, model_name, folder_path, epochs, num_frames, shuffle_size, batch_size, height, width)
-        generate_triton_config(model_name, folder_path)
+        
 
         input()
 

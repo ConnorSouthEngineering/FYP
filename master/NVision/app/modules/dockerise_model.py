@@ -38,7 +38,7 @@ async def launch_container(image_tag, task_id, folder_name):
     volume_mapping = {
                   f"{abs_path}/{folder_name}": {'bind': '/mnt', 'mode': 'rw'},  
     }
-    debug_mode = False
+    debug_mode = True
 
     try:
         response = client.login(registry="https://nvcr.io", username="$oauthtoken", password=(open(key_path, "r").read()))
@@ -56,7 +56,7 @@ async def launch_container(image_tag, task_id, folder_name):
                             stdin_open=True, 
                             entrypoint=entry_cmd,
                             volumes=volume_mapping)
-        file_list = [f'{model_name}.conf',f'{model_name}.h5',f'{model_name}_history.png',f'{model_name}_test_confusion.png',f'{model_name}_training_confusion.png']
+        file_list = [f'{model_name}.conf',f'{model_name}_history.png',f'{model_name}_test_confusion.png',f'{model_name}_training_confusion.png']
         file_status = False
         while not file_status:
             present_files = []
