@@ -1,10 +1,14 @@
 import tensorflow as tf
-import pathlib
 from keras import layers, utils, losses, optimizers, Sequential
+
+import pathlib
+import argparse
+import os
+
 from load_data import FrameGenerator
 from visualise_results import plot_history, get_actual_predicted_labels, plot_confusion_matrix
-import argparse
-import configparser
+from create_config import generate_training_config, generate_triton_config, export_classes
+
 
 def extract_data(folder_path, num_frames):
         
@@ -81,25 +85,6 @@ def get_class_maps(folder_path, num_frames):
     labels = list(classes.keys())
     return labels
 
-
-def generate_config(model_name, folder_path, epochs, num_frames, shuffle_size, batch_size, height, width):
-    labels = get_class_maps(folder_path, num_frames)
-    config = configparser.ConfigParser()
-    config['PREDICTION'] = {
-        'num_frames': num_frames,
-        'class_list': labels,
-        'height': height,
-        'width': width
-    }
-    config['TRAINING'] = {
-        'epochs': epochs,
-        'shuffle_size': shuffle_size,
-        'batch_size': batch_size
-    }
-    with open(f'{folder_path}/{model_name}.conf', 'w') as configfile:
-        config.write(configfile)
-    return labels
-
 def main():
     with tf.device('/GPU:0'):
         parser = argparse.ArgumentParser()
@@ -118,6 +103,7 @@ def main():
         height = 224
         width = 224
         
+        #folder_path = "/home/connor/Desktop/FYP/master/NVision/model_tasks/Testing_Folder"
         folder_path = "/mnt"
 
         train_ds, val_ds, test_ds = extract_data(folder_path, num_frames)
@@ -147,14 +133,19 @@ def main():
             
         model.evaluate(test_ds, return_dict=True)
             
-        labels = generate_config(model_name, folder_path, epochs, num_frames, shuffle_size, batch_size, height, width)
+        labels = get_class_maps(folder_path, num_frames)
 
         actual, predicted = get_actual_predicted_labels(model, train_ds)
         plot_confusion_matrix(actual, predicted, labels, 'training', model_name, folder_path)
 
         actual, predicted = get_actual_predicted_labels(model, test_ds)
         plot_confusion_matrix(actual, predicted, labels, 'test', model_name, folder_path)
-        model.save(f"{folder_path}/{model_name}.h5")
+
+        model.save(os.path.join(folder_path, model_name), save_format='tf')
+        
+        generate_training_config(labels, model_name, folder_path, epochs, num_frames, shuffle_size, batch_size, height, width)
+        generate_triton_config(model_name, folder_path)
+
         input()
 
 if __name__ == "__main__":

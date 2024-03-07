@@ -26,7 +26,7 @@ def build_cudatf_image(client, image_tag):
 async def launch_container(image_tag, task_id, folder_name):
     client = docker.from_env()
     task = await get_task_data(task_id)
-    abs_path = f'/home/{getpass.getuser()}/Desktop/FYP/NVision/app'
+    abs_path = f'/home/{getpass.getuser()}/Desktop/FYP/master/NVision/app'
     key_path = f'/home/{getpass.getuser()}/api.key'
     model_name = f"{task['model_name']}_{task_id}"
     entry_cmd = ["python3", "train_model.py",
