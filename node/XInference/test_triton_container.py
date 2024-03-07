@@ -37,17 +37,20 @@ def launch_container(image_tag, folder_name):
                                                  )
     print(image)
     print(build_result)
-    input()
-    #Need to sort out nvidia docker installation next
+    print("building container")
+
     container = client.containers.run(f"{image_tag}:latest", 
                             name=model_name, 
                             detach=True,
+                            runtime="nvidia",
                             device_requests=[docker.types.DeviceRequest(count=-1, capabilities=[['gpu']])],
                             ports=port_mapping, 
                             tty=True, 
                             stdin_open=True, 
-                            command="tritonserver --model-repository=/models",
+                            command="--model-repository=/models",
                             volumes=volume_mapping)
+    print("built container")
+    print(container)
     input()
     container.stop()
     container.remove()
@@ -57,4 +60,4 @@ def main():
 
 main()
 
-"""      """
+"""  command="--model-repository=/models",   """
