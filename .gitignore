@@ -1,7 +1,7 @@
 master/NVision/app/sources/
-master/NVision/app/processing*
-master/NVision/model_tasks/*
+master/NVision/model_tasks
+master/NVision/model_repo
 node/XInference/model-repo
 node/XInference/extras
-model_tasks
+
 Excess

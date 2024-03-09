@@ -26,7 +26,7 @@ def build_cudatf_image(client, image_tag):
 async def launch_container(image_tag, task_id, folder_name):
     client = docker.from_env()
     task = await get_task_data(task_id)
-    abs_path = f'/home/{getpass.getuser()}/Desktop/FYP/master/NVision/app'
+    abs_path = f'/home/{getpass.getuser()}/Desktop/FYP/master/NVision'
     key_path = f'/home/{getpass.getuser()}/api.key'
     model_name = f"{task['model_name']}_{task_id}"
     entry_cmd = ["python3", "train_model.py",
@@ -36,7 +36,8 @@ async def launch_container(image_tag, task_id, folder_name):
              "--shuffle_size", str(task['shuffle_size']),
              "--batch_size", str(task['batch_size'])]
     volume_mapping = {
-                  f"{abs_path}/{folder_name}": {'bind': '/mnt', 'mode': 'rw'},  
+                  f"{abs_path}/model_tasks/{folder_name}": {'bind': '/mnt', 'mode': 'rw'},  
+                  f"{abs_path}/model_repo": {'bind': '/model_repo', 'mode': 'rw'},
     }
     debug_mode = True
 
@@ -56,19 +57,20 @@ async def launch_container(image_tag, task_id, folder_name):
                             stdin_open=True, 
                             entrypoint=entry_cmd,
                             volumes=volume_mapping)
-        file_list = [f'{model_name}.conf',f'{model_name}_history.png',f'{model_name}_test_confusion.png',f'{model_name}_training_confusion.png']
+        file = 'config.pbtxt'
         file_status = False
         while not file_status:
             present_files = []
-            for file in file_list:
-                path = f'./{folder_name}/{file}'
+            path = f'../model_repo/{model_name}/1/{file}'
+            if os.path.exists(path):
                 if os.path.isfile(path):
-                    present_files.append(file)
+                    file_status = True
                 else:
                     sleep(5)
                     print("files missing")
-            if len(present_files) == len(file_list):
-                file_status = True
+            else:
+                sleep(5)
+                print("files missing")
         container.stop()
         container.remove()
         return True
