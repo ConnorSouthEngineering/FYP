@@ -1,0 +1,12 @@
+version: '2.3'
+services:
+  trition:
+    build:
+      context: ./XInference
+    ports:
+      - "8000:8000"
+      - "8001:8001"
+      - "8002:8002"
+    command: "--model-repository=/models --backend-config=tensorflow,version=2"
+    volumes:
+      - "./XInference/model-repo:/models"
