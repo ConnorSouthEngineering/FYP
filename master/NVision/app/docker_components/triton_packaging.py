@@ -138,7 +138,7 @@ def reorganise_folder(model_name, folder_path, repo_path):
         print(file)
         if file != "variables" and file != "assets":
             os.replace(f"{folder_path}/{model_name}/{file}", f"{folder_path}/{model_name}/1/model.savedmodel/{file}") 
-    os.replace(f"{folder_path}/config.pbtxt", f"{folder_path}/{model_name}/1/config.pbtxt")
+    os.replace(f"{folder_path}/config.pbtxt", f"{folder_path}/{model_name}/config.pbtxt")
     os.removedirs(f"{folder_path}/{model_name}/assets")
     os.removedirs(f"{folder_path}/{model_name}/variables")
     shutil.copytree(f"{folder_path}/{model_name}", f"{repo_path}/{model_name}")
