@@ -1,6 +1,7 @@
 import tensorflow as tf
 import os 
 import configparser
+import shutil
 
 def compile_number(current_number):
     number = ""
@@ -45,9 +46,6 @@ def collect_model_configuration(model_path):
     loaded_model = tf.saved_model.load(model_path)
     serving_default = loaded_model.signatures['serving_default']
 
-    ##Pulls two items from structured_input_signature, 
-    ##1) Name of the tensor
-    ##2) The TensorSpec object -- contains shape, dtype and name
     for input_name, input_tensor in serving_default.structured_input_signature[1].items():
             model_input_name = input_name
             model_input_shape = input_tensor.shape
@@ -61,7 +59,7 @@ def collect_model_configuration(model_path):
     return model_input_name, model_input_dtype, model_input_shape, model_output_name, model_output_dtype, model_output_shape
 
 def write_config(config_lines, folder_path):
-    with open(f"{folder_path}/conf.pbtxt", "w") as file:
+    with open(f"{folder_path}/config.pbtxt", "w") as file:
         for line in config_lines:
             file.write(line + "\n")
     print("Config file created")
@@ -124,6 +122,30 @@ def generate_training_config(labels, model_name, folder_path, epochs, num_frames
         'shuffle_size': shuffle_size,
         'batch_size': batch_size
     }
-    with open(f'{folder_path}/{model_name}.conf', 'w') as configfile:
+    with open(f'{folder_path}/{model_name}.config', 'w') as configfile:
         config.write(configfile)
-    return
+
+
+def reorganise_folder(model_name, folder_path, repo_path):
+    variables_files = os.listdir(f"{folder_path}/{model_name}/variables")
+    base_files = os.listdir(f"{folder_path}/{model_name}")
+    directories_path = f"{folder_path}/{model_name}/1/model.savedmodel/variables"
+    os.makedirs(directories_path)
+    for file in variables_files:
+        print(file)
+        os.replace(f"{folder_path}/{model_name}/variables/{file}", f"{folder_path}/{model_name}/1/model.savedmodel/variables/{file}")
+    for file in base_files:
+        print(file)
+        if file != "variables" and file != "assets":
+            os.replace(f"{folder_path}/{model_name}/{file}", f"{folder_path}/{model_name}/1/model.savedmodel/{file}") 
+    os.replace(f"{folder_path}/config.pbtxt", f"{folder_path}/{model_name}/1/config.pbtxt")
+    os.removedirs(f"{folder_path}/{model_name}/assets")
+    os.removedirs(f"{folder_path}/{model_name}/variables")
+    shutil.copytree(f"{folder_path}/{model_name}", f"{repo_path}/{model_name}")
+
+
+
+def create_triton_package(labels, model_name, folder_path, repo_path, epochs, num_frames, shuffle_size, batch_size, height, width):
+    create_triton_config(model_name, folder_path)
+    generate_training_config(labels, model_name, folder_path, epochs, num_frames, shuffle_size, batch_size, height, width)
+    reorganise_folder(model_name, folder_path, repo_path)
