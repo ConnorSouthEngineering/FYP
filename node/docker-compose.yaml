@@ -2,11 +2,20 @@ version: '2.3'
 services:
   trition:
     build:
-      context: ./XInference
+      context: ./Triton
     ports:
       - "8000:8000"
       - "8001:8001"
       - "8002:8002"
-    command: "--model-repository=/models --backend-config=tensorflow,version=2"
     volumes:
-      - "./XInference/model-repo:/models"
+      - "remote-repo:/models"
+    command: "--model-repository=/models --backend-config=tensorflow,version=2"
+    stdin_open: true
+    tty: true
+volumes:
+  remote-repo:
+    driver: local
+    driver_opts:
+      type: "nfs"
+      o: "addr=192.168.0.160,nolock,soft,rw"
+      device: ":/home/connor/Desktop/FYP/master/NVision/model_repo"
