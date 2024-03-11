@@ -1,15 +1,9 @@
 master/NVision/app/sources/
-<<<<<<< HEAD
-master/NVision/app/processing*
-master/NVision/model_tasks/*
-node/Triton/model_repo
-node/Triton/extras
-model_tasks
-=======
 master/NVision/model_tasks
 master/NVision/model_repo
-node/XInference/model-repo
-node/XInference/extras
+node/XInference/*.avi
+node/XInference/*.mp4
+node/XInference/triton_inference_test.py
+node/Triton/extras
 
->>>>>>> 5026db6114217a4b53e9fc68d1148f5cffdbbe94
 Excess

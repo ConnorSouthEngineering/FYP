@@ -32,20 +32,13 @@ async def create_model(request):
     else:
         update_task_status(task_id,"failed")
         return web.Response(text=f"Task {task_id} has failed")
-    return web.Response(text=f"Task {task_id} has succeeded")
-    
-    
-
-async def request_model(request):
-    body = await request.json()
-    model_id = body['model_id']
+    return web.Response(text=f"Task {task_id} has succeeded") 
 
 async def server_up():
     server = '0.0.0.0'
     port = 8080
     app = web.Application()
     app.add_routes([web.post('/model/create', create_model)])
-    app.add_routes([web.post('/model/request', request_model)])
     runner = web.AppRunner(app)
     await runner.setup()
     site = web.TCPSite(runner, server, port)
