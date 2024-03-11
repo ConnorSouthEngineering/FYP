@@ -4,6 +4,33 @@ BEGIN;
 
 CREATE TYPE FREQUENCY_UNIT AS ENUM ('day','week','month','year');
 
+CREATE TABLE Nodes(
+    node_id BIGSERIAL PRIMARY KEY,
+    node_name VARCHAR NOT NULL,
+    node_address VARCHAR NOT NULL,
+    status_value VARCHAR NOT NULL,
+    creation_date DATE NOT NULL
+);
+
+CREATE TABLE Devices(
+    device_id BIGSERIAL PRIMARY KEY,
+    device_name VARCHAR NOT NULL,
+    creation_date DATE NOT NULL
+);
+
+CREATE TABLE NodeDevice(
+    node_device_id BIGSERIAL PRIMARY KEY,
+    node_id INT REFERENCES Nodes(node_id) NOT NULL,
+    device_id INT REFERENCES Devices(device_id) NOT NULL,
+    status_value VARCHAR NOT NULL
+);
+
+CREATE TABLE NodeKeys(
+    key_value UUID PRIMARY KEY DEFAULT public.uuid_generate_v4(),
+    node_id INT REFERENCES Nodes(node_id),
+    creation_date DATE NOT NULL
+);
+
 CREATE TABLE Targets(
     target_id BIGSERIAL PRIMARY KEY,
     target_name VARCHAR NOT NULL,

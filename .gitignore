@@ -5,5 +5,5 @@ node/XInference/*.avi
 node/XInference/*.mp4
 node/XInference/triton_inference_test.py
 node/Triton/extras
-
+master/VisionLinkAPI/config.json
 Excess

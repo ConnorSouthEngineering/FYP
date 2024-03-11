@@ -13,6 +13,8 @@ services:
       - postgres_data:/var/lib/postgresql/data
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    networks:
+      - master-bridge
   web:
     build:
       context: ./OVision
@@ -21,6 +23,8 @@ services:
     volumes:
       - ./OVision:/app
       - /app/node_modules
+    networks:
+      - master-bridge
   api:
     build: 
       context: ./VisionLinkAPI
@@ -28,7 +32,10 @@ services:
      - "3000:3000"
     extra_hosts:
       - "host.docker.internal:host-gateway"
-
+    networks:
+      - master-bridge
 volumes:
   postgres_data:
-
+networks:
+  master-bridge:
+    external: true
