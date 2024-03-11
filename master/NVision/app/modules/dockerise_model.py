@@ -61,7 +61,7 @@ async def launch_container(image_tag, task_id, folder_name):
         file_status = False
         while not file_status:
             present_files = []
-            path = f'../model_repo/{model_name}/1/{file}'
+            path = f'../model_repo/{model_name}/{file}'
             if os.path.exists(path):
                 if os.path.isfile(path):
                     file_status = True
