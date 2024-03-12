@@ -55,6 +55,23 @@ router.post('/connect', async (req, res, next) => {
             break;
     }
 });
+router.post('/connect/devices', async (req, res, next) => {
+    console.log(req.body);
+    const _node_id = req.body.node_id;
+    const _cameras = req.body.cameras;
+    const _date = new Date().toISOString();
+    let params = [JSON.stringify(_cameras), _date];
+    try {
+        let result = await executeF("vision_data", "insert_devices", params);
+        const device_ids = result[0].insert_devices;
+        params = [_node_id, JSON.stringify(device_ids), "Connected"];
+        result = await executeF("vision_data", "update_node_device_map", params);
+        res.status(200).json({ status: "Synced" });
+    }
+    catch (err) {
+        res.status(500).json({ status: err });
+    }
+});
 router.get('/', (req, res, next) => {
     const _item_limit = parseInt(req.query.itemLimit, 10) || 10;
     const _current_page = parseInt(req.query.currentPage, 10) || 1;

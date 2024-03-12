@@ -1,9 +1,12 @@
+
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const app = express();
 const fs = require('fs');
 const executeF= require('./api/execute_F.js');
+const startPolling = require('./api/polling.js');
+
 app.set('trust proxy', true); 
 
 const config = JSON.parse(fs.readFileSync('./config.json', 'utf8'));
@@ -51,4 +54,6 @@ app.use((req, res, next) => {
     error.status = 404;
     next(error);
 });
+
+startPolling();
 module.exports = app;

@@ -22,7 +22,8 @@ CREATE TABLE NodeDevice(
     node_device_id BIGSERIAL PRIMARY KEY,
     node_id INT REFERENCES Nodes(node_id) NOT NULL,
     device_id INT REFERENCES Devices(device_id) NOT NULL,
-    status_value VARCHAR NOT NULL
+    status_value VARCHAR NOT NULL,
+    UNIQUE(node_id, device_id)
 );
 
 CREATE TABLE NodeKeys(

@@ -1,5 +1,5 @@
 SET SCHEMA 'vision_data';
-CREATE OR REPLACE FUNCTION update_model_task_status(_task_id INT, _status_value VARCHAR)
+CREATE OR REPLACE FUNCTION UPDATE_MODEL_TASK_STATUS(_task_id INT, _status_value VARCHAR)
 RETURNS VARCHAR AS $$
 BEGIN
     SET SCHEMA 'vision_data';
