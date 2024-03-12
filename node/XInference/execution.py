@@ -1,12 +1,13 @@
 from aiohttp import web
 import asyncio
-
-from modules.gstreamer import update_system_cameras
 import json
 import platform 
+import sys
+
+from modules.gstreamer import update_system_cameras
+from modules.connection import configure_connection
 
 cameras = []
-camera_task = None
 
 async def get_cameras(request):
     global cameras
@@ -33,9 +34,20 @@ async def server_up():
     await runner.setup()
     site = web.TCPSite(runner, server, port)
     await site.start()
-    global camera_task
+    connection_task =  loop.create_task(configure_connection())
+    await connection_task
+    if connection_task.result() == 'isolated':
+        print("The node cannot connect securely with the master server")    
+        print(f"This server has been launched in isolated mode: http://0.0.0.0:2500")
+    elif connection_task.result() == 'remote':
+        print("The node has connected securely with the master server")    
+        print(f"This server has been launched in remote mode: http://0.0.0.0:2500")
+    else:
+        print("Server could not be configured")
+        sys.exit(1)
     camera_task = loop.create_task(update_system_cameras(cameras))
-    print(f"Server ready to recieve model requests http://{server}:{port}")
+    
+    
 
 async def main():
     await server_up()
