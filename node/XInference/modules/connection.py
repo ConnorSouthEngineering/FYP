@@ -21,7 +21,10 @@ def reconnect(node_config):
     }
     json_body = json.dumps(body)
     headers = {'Content-Type':'application/json'}
-    return requests.post(f"http://{node_config['CONNECTION']['master_ip']}:{node_config['CONNECTION']['master_port']}/nodes/connect",data=json_body,headers=headers)
+    try:
+        return requests.post(f"http://{node_config['CONNECTION']['master_ip']}:{node_config['CONNECTION']['master_port']}/nodes/connect",data=json_body,headers=headers)
+    except:
+        return
     
 def connect(node_config):
     body = {
@@ -31,8 +34,22 @@ def connect(node_config):
     }
     json_body = json.dumps(body)
     headers = {'Content-Type':'application/json'}
-    return requests.post(f"http://{node_config['CONNECTION']['master_ip']}:{node_config['CONNECTION']['master_port']}/nodes/connect",data=json_body,headers=headers)
+    try:
+        return requests.post(f"http://{node_config['CONNECTION']['master_ip']}:{node_config['CONNECTION']['master_port']}/nodes/connect",data=json_body,headers=headers)
+    except:
+        return
 
+async def connect_devices(json_body):
+    abs_path = f'/home/{getpass.getuser()}/Desktop/FYP/node/XInference/node.conf'
+    node_config = configparser.ConfigParser()
+    node_config.read(abs_path)
+    headers = {'Content-Type':'application/json'}
+    response = requests.post(f"http://{node_config['CONNECTION']['master_ip']}:{node_config['CONNECTION']['master_port']}/nodes/connect/devices",data=json_body,headers=headers)
+    if response and response.json()['status']:
+        return response.json()['status']
+    else:
+        return "Error"
+    
 
 async def configure_connection():
     abs_path = f'/home/{getpass.getuser()}/Desktop/FYP/node/XInference/node.conf'
