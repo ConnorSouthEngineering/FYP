@@ -4,12 +4,22 @@ import json
 import configparser
 import sys
 import getpass
-
+import os
 from modules.gstreamer import update_system_cameras, manage_pipelines, initialise_gstreamer, display_sinks
 from modules.connection import configure_connection, connect_devices
+from modules.inference import initialise_inference
 from modules.classes import PipelineStorage
 
 cameras = []
+pipelines = PipelineStorage()
+active_infernce = {}
+
+async def launch_inference(request):
+    global pipelines
+    pipeline_info = pipelines.get_pipeline("vi-output, ar0230 30-0043")
+    sink_name = "sink_initialisation"
+    inference_task = loop.create_task(initialise_inference(pipeline_info["pipeline"], sink_name))
+    return web.Response(text="Inference launched", content_type='application/json')
 
 async def available_node(request):
     return web.Response(text="Available")
@@ -32,11 +42,10 @@ async def get_cameras(request):
                     }
         json_body = json.dumps(body)  
         return json_body
-    
-async def launch_inference():
-    print("Launch inference")
 
 async def server_up():
+    os.environ["GST_DEBUG_DUMP_DOT_DIR"] = "/tmp"
+    os.putenv('GST_DEBUG_DUMP_DIR_DIR', '/tmp')
     server = '0.0.0.0'
     port = 2500
     app = web.Application()
@@ -61,6 +70,7 @@ async def server_up():
         gloop = gstreamer_task.result()
         pipeline_task = loop.create_task(manage_pipelines(node_devices, gloop))
         await pipeline_task
+        global pipelines
         pipelines = pipeline_task.result()
         display_task = loop.create_task(display_sinks(pipelines))
         await display_task

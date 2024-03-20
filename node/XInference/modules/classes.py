@@ -20,7 +20,6 @@ class PipelineStorage:
         return self.storage[pipeline_name]
 
     def add_pipeline(self, pipeline_name, sinks, pipeline_object, tee):
-        # Ensure sinks is always treated as a list to avoid iteration over string characters
         if not isinstance(sinks, list):
             sinks = [sinks]
         self.storage[pipeline_name] = {
@@ -56,9 +55,6 @@ class PipelineStorage:
         return "\n".join(all_pipelines_info)
     
     def get_sinks(self, pipeline_name):
-        """
-        Retrieve the list of sink names for a specific pipeline.
-        """
         pipeline_info = self.get_pipeline(pipeline_name)
         if pipeline_info:
             return pipeline_info["sinks"]

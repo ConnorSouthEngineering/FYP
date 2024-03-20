@@ -45,17 +45,16 @@ def add_sink(pipeline, deployment_name, tee):
         pipeline.set_state(Gst.State.NULL)
     queue = Gst.ElementFactory.make("queue", f"queue_{deployment_name}")
     queue.set_property("leaky", 2)
-    queue.set_property("max-size-buffers", 0)
+    queue.set_property("max-size-buffers", 5)
+    queue.set_property("max-size-time", 16000000)
 
     videoconvert = Gst.ElementFactory.make("videoconvert", f"videoconvert_{deployment_name}")
     videoscale = Gst.ElementFactory.make("videoscale", f"videoscale_{deployment_name}")
     sink = Gst.ElementFactory.make("appsink", f"sink_{deployment_name}")
-    sink = Gst.ElementFactory.make("appsink", None)
     sink.set_property("emit-signals", True)  
     sink.set_property("sync", False)
-    sink.set_property("max-buffers", 10)  
+    sink.set_property("max-buffers", 5)  
     sink.set_property("drop", True)  
-    sink.set_property("sync", False)
 
     if not all([queue, videoconvert, videoscale, sink]):
         print("Failed to create elements for new sink")
@@ -66,12 +65,18 @@ def add_sink(pipeline, deployment_name, tee):
     pipeline.add(videoscale)
     pipeline.add(sink)
 
+    if not Gst.Element.link(queue, videoconvert):
+        print("Failed to link queue to videoconvert")
+    if not Gst.Element.link(videoconvert, videoscale):
+        print("Failed to link videoconvert to videoscale")
+    if not Gst.Element.link(videoscale, sink):
+        print("Failed to link videoscale to sink")
+
     pad_template = tee.get_pad_template("src_%u")
     src_pad = tee.request_pad(pad_template, None, None)
     sink_pad = queue.get_static_pad("sink")
     if not src_pad.link(sink_pad) == Gst.PadLinkReturn.OK:
         print("Failed to link tee to queue")
-
     queue.sync_state_with_parent()
     videoconvert.sync_state_with_parent()
     videoscale.sync_state_with_parent()
@@ -97,51 +102,44 @@ def get_camera_path(camera):
 async def initialise_pipeline(camera, gloop):
     global pipelines
     camera_path = get_camera_path(camera)
-    pipeline, tee = generate_pipeline(camera_path, gloop)
+    pipeline, tee = generate_pipeline(camera_path)
     pipeline = add_sink(pipeline,"initialisation", tee)
     pipelines.add_pipeline(camera, "initialisation", pipeline, tee)
     return
 
 def generate_pipeline(camera_path):
-    Gst.init(None)
     pipeline = Gst.Pipeline.new("dynamic-pipeline")
-    source = Gst.ElementFactory.make("v4l2src", "source")
-    source.set_property("device", camera_path)
+    source = Gst.ElementFactory.make("nvv4l2camerasrc", "source")
+    source.set_property("device", "/dev/video0")
     capsfilter = Gst.ElementFactory.make("capsfilter", "caps")
-    caps = Gst.Caps.from_string("video/x-raw, format=(string)UYVY, width=(int)1280, height=(int)720, framerate=(fraction)45/1")
+    caps = Gst.Caps.from_string("video/x-raw(memory:NVMM), format=(string)UYVY, width=(int)1920, height=(int)1080, framerate=(fraction)30/1")
     capsfilter.set_property("caps", caps)
     nvvidconv = Gst.ElementFactory.make("nvvidconv", "nvvidconv")
+    videoconvert = Gst.ElementFactory.make("videoconvert", "videoconvert")
+    rgb_capsfilter = Gst.ElementFactory.make("capsfilter", "rgb_caps")
+    rgb_caps = Gst.Caps.from_string("video/x-raw, format=(string)RGB")
+    rgb_capsfilter.set_property("caps", rgb_caps)
     tee = Gst.ElementFactory.make("tee", "tee")
-    
+
     pipeline.add(source)
     pipeline.add(capsfilter)
     pipeline.add(nvvidconv)
+    pipeline.add(videoconvert)
+    pipeline.add(rgb_capsfilter)
     pipeline.add(tee)
 
-    return pipeline, tee
-
-def generate_pipeline_CPU(camera_path):
-    pipeline = Gst.Pipeline.new(f"dynamic-pipeline")
-    source = Gst.ElementFactory.make("v4l2src", "source")
-    source.set_property("device", camera_path)
-    capsfilter = Gst.ElementFactory.make("capsfilter", "caps")
-    caps = Gst.Caps.from_string("video/x-raw, format=(string)UYVY, width=(int)1920, height=(int)1080, framerate=(fraction)30/1")
-    capsfilter.set_property("caps", caps)
-    tee = Gst.ElementFactory.make("tee", "tee")
-    
-    if not all([pipeline, source, capsfilter, tee]):
-        print("Not all elements could be created.")
-        exit(-1)
-    
-    pipeline.add(source)
-    pipeline.add(capsfilter)  
-    pipeline.add(tee)
-    
     if not source.link(capsfilter):
         print("Failed to link source to capsfilter")
-    if not capsfilter.link(tee):  
-        print("Failed to link capsfilter to tee")
-
+    elif not capsfilter.link(nvvidconv):
+        print("Failed to link capsfilter to nvvidconv")
+    elif not nvvidconv.link(videoconvert):
+        print("Failed to link nvvidconv to videoconvert")
+    elif not videoconvert.link(rgb_capsfilter):
+        print("Failed to link videoconvert to rgb_capsfilter")
+    elif not rgb_capsfilter.link(tee):
+        print("Failed to link rgb_capsfilter to tee")
+    else:
+        print("Elements linked successfully")
     return pipeline, tee
 
 async def manage_pipelines(node_devices, gloop):
@@ -164,3 +162,4 @@ async def display_sinks(pipelines):
     if initialisation_errors:
         return initialisation_errors
     return "Displayed"
+
