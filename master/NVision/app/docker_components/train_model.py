@@ -75,7 +75,7 @@ def create_model(num_frames, height, width, folder_path):
     model.add(layers.Flatten()) 
     num_classes = sum(1 for _ in pathlib.Path(folder_path+"/train").iterdir() if _.is_dir())
     model.add(layers.Dense(num_classes, activation = "softmax"))
-    model.summary()
+    #model.summary()
     return model
 
 def get_class_maps(folder_path, num_frames):
@@ -102,7 +102,7 @@ def main():
         height = 224
         width = 224
         
-        #folder_path = "/home/connor/Desktop/FYP/master/NVision/model_tasks/new_test_2024-03-07-22-15"
+        #folder_path = "/home/connor/Desktop/FYP/master/NVision/model_tasks/Test_2024-03-21-16-52"
         folder_path = "/mnt"
         repo_path = "/model_repo"
 

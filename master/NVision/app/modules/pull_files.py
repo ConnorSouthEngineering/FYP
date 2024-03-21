@@ -5,31 +5,41 @@ import shutil
 from datetime import datetime
 import requests
 
-def find_classes(parent_path, class_names):
-    class_directories = {class_name: [] for class_name in class_names}  
+def find_classes_and_non_matching(parent_path, class_names):
+    
+    class_directories = {class_name: [] for class_name in class_names}
+    class_directories["Other"] = []  
     for item in os.listdir(parent_path):
         item_path = os.path.join(parent_path, item)
         if os.path.isdir(item_path):
+            
+            matched = False
             for class_name in class_names:
                 if item.lower().startswith(class_name.lower()):
                     class_directories[class_name].append(item_path)
+                    matched = True
                     break
+            if not matched:
+                
+                class_directories["Other"].append(item_path)
     return class_directories
 
 def find_directories(sources, directory_path, classes):
-    class_paths = {}
+    class_paths = {"Other": []}  
+    for class_name in classes:  
+        class_paths[class_name] = []
     for source in sources:
         source_path = os.path.join(directory_path, source)
-        print(source_path)
-        if os.path.exists(source_path):  
-            found_directories = find_classes(source_path, classes)
-            for class_name, paths in found_directories.items():
-                if paths:  
-                    if class_name in class_paths:
-                        class_paths[class_name].extend(paths)  
-                    else:
-                        class_paths[class_name] = paths
+        print(f"Processing source path: {source_path}")
+        if os.path.exists(source_path):
+            
+            found_directories = find_classes_and_non_matching(source_path, classes)
+            
+            for key, paths in found_directories.items():
+                class_paths[key].extend(paths)
+
     return class_paths
+
 
 def find_files(class_paths):
     class_files = {}
@@ -146,7 +156,7 @@ async def pull_files(task_id):
     classes, sources, splits, model_name = get_model_parmeters(task_id)
     classes = get_class_maps(classes)
     sources = get_source_maps(sources)
-    directory_path = "./sources"  
+    directory_path = "./sources"
     class_paths = find_directories(sources, directory_path, classes)
     class_files = find_files(class_paths)
     display_tree(class_files)

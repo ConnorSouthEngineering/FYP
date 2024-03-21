@@ -15,8 +15,11 @@ async def create_model(request):
     files_task = asyncio.create_task(pull_files(task_id))
     await files_task
     folder_path = files_task.result()
+    parts = folder_path.split("/")
+    folder_name = "/".join(parts[2:])
+    print(folder_name)
     update_task_status(task_id,"training")
-    container_task = asyncio.create_task(launch_container(image_tag, task_id, folder_path))
+    container_task = asyncio.create_task(launch_container(image_tag, task_id, folder_name))
     await container_task
     if(container_task.result()):
         update_task_status(task_id,"trained")
@@ -24,7 +27,7 @@ async def create_model(request):
     else:
         update_task_status(task_id,"failed")
         return web.Response(text=f"Task {task_id} has failed")
-    creation_task = asyncio.create_task(create_model_entry(task_id, folder_path))
+    creation_task = asyncio.create_task(create_model_entry(task_id, folder_name))
     await creation_task
     if(creation_task.result()):
         update_task_status(task_id,"trained")
