@@ -11,7 +11,7 @@ Gst.init(None)
 def preprocess_frames(frame, WIDTH, HEIGHT):
     frame_resized = cv2.resize(frame, (WIDTH, HEIGHT))
     frame_rgb = cv2.cvtColor(frame_resized, cv2.COLOR_BGR2RGB)
-    return frame_rgb.astype('float32') / 255.0
+    return frame_rgb.astype('float32') / 255.0  
 
 async def initialise_inference(pipeline, sink_name):
     HEIGHT, WIDTH = 224, 224
@@ -20,6 +20,9 @@ async def initialise_inference(pipeline, sink_name):
     CLASS_LIST = ['cooking', 'drinking', 'eating', 'pouring']
     triton_url = 'localhost:8000'
     triton_client = httpclient.InferenceServerClient(url=triton_url)
+    if not isinstance(pipeline, Gst.Pipeline):
+        print("The provided argument is not a Gst.Pipeline instance.")
+
     appsink = pipeline.get_by_name(sink_name)
     if not appsink:
         print("Appsink not found.")
@@ -37,11 +40,13 @@ def get_pipeline_state(pipeline):
     return current_state
 
 def pull_frame(pipeline, appsink, frames_queue, WIDTH, HEIGHT, SEQUENCE_LENGTH, triton_client, MODEL_NAME, CLASS_LIST):
+    
     print("Inference Occurring")
     sample = appsink.emit("pull-sample")
     if sample is None:
         print("No more frames or sink unavailable.")
         return False  
+    
     print("Buffers captured")
     try:
         print("Buffer mapping")
@@ -50,6 +55,7 @@ def pull_frame(pipeline, appsink, frames_queue, WIDTH, HEIGHT, SEQUENCE_LENGTH, 
         width = caps_format.get_value("width")
         height = caps_format.get_value("height")
         success, map_info = buffer.map(Gst.MapFlags.READ)
+        
         if not success:
             print("Failed to map buffer")
             return True
@@ -64,10 +70,12 @@ def pull_frame(pipeline, appsink, frames_queue, WIDTH, HEIGHT, SEQUENCE_LENGTH, 
     finally:
         if 'map_info' in locals() and map_info:
             buffer.unmap(map_info)
+
     if len(frames_queue) == SEQUENCE_LENGTH:
         print("Frame queue length acceptable initialising inference")
         input_batch = np.stack(list(frames_queue), axis=0)
         input_batch = np.expand_dims(input_batch, axis=0)
+            
         try:
             input_tensor = httpclient.InferInput('conv_lstm2d_input', input_batch.shape, "FP32")
             input_tensor.set_data_from_numpy(input_batch)
@@ -80,4 +88,4 @@ def pull_frame(pipeline, appsink, frames_queue, WIDTH, HEIGHT, SEQUENCE_LENGTH, 
         except InferenceServerException as e:
             print(f"InferenceServerException: {str(e)}")
         frames_queue.clear() 
-    return True 
+    return True  
