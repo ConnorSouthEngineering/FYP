@@ -5,6 +5,7 @@ import configparser
 import sys
 import getpass
 import os
+
 from modules.gstreamer import update_system_cameras, manage_pipelines, initialise_gstreamer, display_sinks
 from modules.connection import configure_connection, connect_devices
 from modules.inference import initialise_inference
@@ -59,6 +60,7 @@ async def server_up():
     camera_task = loop.create_task(update_system_cameras(cameras))
     connection_task =  loop.create_task(configure_connection())
     await connection_task
+    global pipelines
     if connection_task.result() == 'isolated':
         print("The node cannot connect securely with the master server")    
         print(f"This server has been launched in isolated mode: http://0.0.0.0:2500")
@@ -70,7 +72,7 @@ async def server_up():
         gloop = gstreamer_task.result()
         pipeline_task = loop.create_task(manage_pipelines(node_devices, gloop))
         await pipeline_task
-        global pipelines
+        
         pipelines = pipeline_task.result()
         display_task = loop.create_task(display_sinks(pipelines))
         await display_task
@@ -82,6 +84,7 @@ async def server_up():
             for error in display_task.result():
                 print(error)
             sys.exit(1)
+
     elif connection_task.result() == 'remote':
         print("The node has connected securely with the master server")    
         print(f"This server has been launched in remote mode: http://0.0.0.0:2500")
@@ -89,14 +92,24 @@ async def server_up():
         device_connection_task = loop.create_task(connect_devices(node_devices))
         await device_connection_task
         if device_connection_task.result() == 'Synced':
+            ### Please not the below is only for debugging and development purposes when the master server is off and should be removed when in a fit state
+            node_devices = await get_cameras("manual")
             gstreamer_task = loop.create_task(initialise_gstreamer())
             await gstreamer_task
             gloop = gstreamer_task.result()
-            pipeline_task = loop.create_task(manage_pipelines(node_devices))
+            pipeline_task = loop.create_task(manage_pipelines(node_devices, gloop))
             await pipeline_task
             pipelines = pipeline_task.result()
-            print(pipelines.display_all_pipelines())
-            print("Initial devices have been synced with the master service")
+            display_task = loop.create_task(display_sinks(pipelines))
+            await display_task
+            if display_task.result() == 'Displayed':
+                print("Device pipelines initialised successfully")
+                print(pipelines.display_all_pipelines())
+            else:
+                print("Device pipeline(s) failed to initialise")
+                for error in display_task.result():
+                    print(error)
+                sys.exit(1)
         else:
             print(f"Initial devices have failed to sync with the master service")
             sys.exit(1)
