@@ -12,6 +12,10 @@ from modules.classes import PipelineStorage
 camera_task = None
 pipelines = PipelineStorage()
 
+def get_pipeline_state(pipeline):
+    state_change, current_state, pending_state = pipeline.get_state(Gst.CLOCK_TIME_NONE)
+    return current_state
+
 async def initialise_gstreamer():
     Gst.init(None)
     loop = GLib.MainLoop()
@@ -40,9 +44,9 @@ def get_pipeline_state(pipeline):
     state_change, current_state, pending_state = pipeline.get_state(Gst.CLOCK_TIME_NONE)
     return current_state
 
-def add_sink(pipeline, deployment_name, tee):
+def add_sink(pipeline, deployment_name, tee, gloop_state):
     if get_pipeline_state(pipeline) == Gst.State.PLAYING:
-        pipeline.set_state(Gst.State.NULL)
+        pipeline.set_state(Gst.State.PAUSED)
     queue = Gst.ElementFactory.make("queue", f"queue_{deployment_name}")
     queue.set_property("leaky", 2)
     queue.set_property("max-size-buffers", 5)
@@ -59,6 +63,11 @@ def add_sink(pipeline, deployment_name, tee):
     if not all([queue, videoconvert, videoscale, sink]):
         print("Failed to create elements for new sink")
         return pipeline
+
+    queue.set_state(Gst.State.PAUSED)
+    videoconvert.set_state(Gst.State.PAUSED)
+    videoscale.set_state(Gst.State.PAUSED)
+    sink.set_state(Gst.State.PAUSED)
 
     pipeline.add(queue)
     pipeline.add(videoconvert)
@@ -82,7 +91,12 @@ def add_sink(pipeline, deployment_name, tee):
     videoscale.sync_state_with_parent()
     sink.sync_state_with_parent()
 
-    return pipeline
+    if gloop_state:
+        print(get_pipeline_state(pipeline))
+        pipeline.set_state(Gst.State.PLAYING)
+        return False
+    else:
+        return pipeline
 
 def get_camera_path(camera):
     monitor = Gst.DeviceMonitor()
@@ -97,39 +111,17 @@ def get_camera_path(camera):
     monitor.stop()
     props = device_obj.get_properties()
     camera_path = props.get_string("device.path")
+    print(camera_path)
     return camera_path
 
-
-def extract_camera_path(pipeline):
-    elements = pipeline.iterate_elements()
-    while True:
-        result, element = elements.next()
-        if result == Gst.IteratorResult.DONE:
-            break
-        elif result == Gst.IteratorResult.OK:
-            if element.get_factory() and 'nvv4l2camerasrc' in element.get_factory().get_name():
-                return element.get_property("device")
-
-async def get_path_camera(pipeline):
-    camera_path_element = extract_camera_path(pipeline)
-    monitor = Gst.DeviceMonitor()
-    video_filter = Gst.Caps.from_string("video/x-raw")
-    monitor.add_filter("Video/Source", video_filter)
-    monitor.start()
-    device_obj = None
-    for device in monitor.get_devices():
-        if device.get_properties().get_string("device.path") == camera_path_element:
-            device_obj = device
-            break
-    monitor.stop()
-    camera_name = device_obj.get_display_name()
-    return camera_name
+async def add_new_sink(pipeline, deployment_name, tee):
+    GLib.timeout_add_seconds(1, add_sink, pipeline, deployment_name, tee, True)
 
 async def initialise_pipeline(camera, gloop):
     global pipelines
     camera_path = get_camera_path(camera)
     pipeline, tee = generate_pipeline(camera_path)
-    pipeline = add_sink(pipeline,"initialisation", tee)
+    pipeline = add_sink(pipeline,"initialisation", tee, False)
     pipelines.add_pipeline(camera, "initialisation", pipeline, tee)
     return
 

@@ -5,11 +5,12 @@ import configparser
 import sys
 import getpass
 import os
+import ast
 
-from modules.gstreamer import update_system_cameras, manage_pipelines, initialise_gstreamer, display_sinks, get_path_camera
+from modules.gstreamer import update_system_cameras, manage_pipelines, initialise_gstreamer, display_sinks, add_new_sink
 from modules.connection import configure_connection, connect_devices
 from modules.inference import initialise_inference
-from modules.deployments import retrieve_active_deployments
+from modules.deployments import retrieve_active_deployments, get_model, gather_model_information, extract_list_from_string
 from modules.classes import PipelineStorage
 
 cameras = []
@@ -23,7 +24,29 @@ async def intercept_launch_inference(request):
     await inference_task
     return web.Response(text="Inference launched", content_type='application/json')
 
-async def launch_inference(deployment_id, model_id, pipeline):
+async def launch_inference(deployment_id, model_id, pipeline, name, tee):
+    abs_path = f'/home/{getpass.getuser()}/Desktop/FYP/node/XInference/node.conf'
+    node_config = configparser.ConfigParser()
+    node_config.read(abs_path)
+    model_information = await get_model(model_id, node_config)
+    num_frames = model_information['num_frames']
+    triton_location_name = model_information['location_name']
+    deployment_name = f"deployment_{deployment_id}"
+    height, width, config_classes = await gather_model_information(triton_location_name)   
+    class_list = await extract_list_from_string(config_classes)
+    create_sink_task = loop.create_task(add_new_sink(pipeline, deployment_name, tee))
+    while True:
+        appsink = pipeline.get_by_name(f'sink_{deployment_name}')
+        if not appsink:
+            print("Appsink not found.")
+        else:
+            print(appsink)
+            break
+        await asyncio.sleep(1)
+    inference_task = loop.create_task(initialise_inference(pipeline, f'sink_{deployment_name}', int(height), int(width), class_list, num_frames, triton_location_name))
+    return
+
+async def a_launch_inference(deployment_id, model_id, pipeline):
     global pipelines
     pipeline_info = pipelines.get_pipeline("vi-output, ar0230 30-0043")
     sink_name = "sink_initialisation"
@@ -51,6 +74,20 @@ async def get_cameras(request):
                     }
         json_body = json.dumps(body)  
         return json_body
+
+async def execute_deployment_pipeline(name, pipeline, tee):
+    node_deployments_task = loop.create_task(retrieve_active_deployments(name))
+    await node_deployments_task                    
+    deployments = node_deployments_task.result()
+    if deployments:
+        for deployment in deployments:
+            print(deployment)
+            inference_task = loop.create_task(launch_inference(deployment['deployment_id'], deployment['model_id'], pipeline, name, tee))
+            await inference_task
+        return
+    else:
+        print(f"No active deployments for camera: {name}")
+    return
 
 async def server_up():
     os.environ["GST_DEBUG_DUMP_DOT_DIR"] = "/tmp"
@@ -113,13 +150,13 @@ async def server_up():
             await display_task
             if display_task.result() == 'Displayed':
                 print("Device pipelines initialised successfully")
-                for pipeline in pipelines:
-                    match_camera_task = loop.create_task(get_path_camera(pipeline))
-                    await match_camera_task
-
-                    node_deployments_task = loop.create_task(retrieve_active_deployments(match_camera_task.result()))
-                    await node_deployments_task                    
-                    deployments = node_deployments_task.result()
+                print(pipelines.display_all_pipelines())
+                for name, info in pipelines.items():
+                    print("Processing deployment pipeline: "+name)
+                    pipeline = info['pipeline'] 
+                    tee = info['tee']
+                    deployments_pipeline = loop.create_task(execute_deployment_pipeline(name, pipeline, tee))
+                    await deployments_pipeline
             else:
                 print("Device pipeline(s) failed to initialise")
                 for error in display_task.result():
