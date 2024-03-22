@@ -16,7 +16,7 @@ router.get('/', (req, res, next) => {
         res.status(500).json({ error: err });
     });
 });
-router.get('/:_deployment_id', (req, res, next) => {
+router.get('/id/:_deployment_id', (req, res, next) => {
     const _deployment_id = req.params._deployment_id;
     const params = [_deployment_id];
     executeF("vision_data", "get_deployment", params)

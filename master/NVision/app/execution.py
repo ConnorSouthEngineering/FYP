@@ -21,13 +21,13 @@ async def create_model(request):
     update_task_status(task_id,"training")
     container_task = asyncio.create_task(launch_container(image_tag, task_id, folder_name))
     await container_task
-    if(container_task.result()):
+    if(container_task.result()[0]):
         update_task_status(task_id,"trained")
         print("Success")
     else:
         update_task_status(task_id,"failed")
         return web.Response(text=f"Task {task_id} has failed")
-    creation_task = asyncio.create_task(create_model_entry(task_id, folder_name))
+    creation_task = asyncio.create_task(create_model_entry(task_id, container_task.result()[1]))
     await creation_task
     if(creation_task.result()):
         update_task_status(task_id,"trained")

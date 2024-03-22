@@ -4,6 +4,19 @@ const express = require('express');
 const router = express.Router();
 const executeSP = require('../execute_SP.js');
 const executeF = require('../execute_F.js');
+router.get('/deployments/active', (req, res, next) => {
+    const _node_id = parseInt(req.query.node_id);
+    const _device_id = parseInt(req.query.device_id);
+    const _current_date = new Date().toISOString();
+    const params = [_node_id, _device_id, _current_date];
+    executeF("vision_data", "get_nodes_deployment_models", params)
+        .then(result => {
+        res.status(200).json(result);
+    })
+        .catch(err => {
+        res.status(500).json({ error: err });
+    });
+});
 router.post('/connect', async (req, res, next) => {
     console.log(req.body);
     const _node_key_value = req.body.node_key_value;
@@ -88,6 +101,17 @@ router.get('/key/:key_id', (req, res, next) => {
     const _key_id = req.params.key_id;
     const params = [_key_id];
     executeF("vision_data", "get_key", params)
+        .then(result => {
+        res.status(200).json(result);
+    })
+        .catch(err => {
+        res.status(500).json({ error: err });
+    });
+});
+router.get('/device/name', (req, res, next) => {
+    const _device_name = req.query.deviceName;
+    const params = [_device_name];
+    executeF("vision_data", "get_device_from_name", params)
         .then(result => {
         res.status(200).json(result);
     })

@@ -16,7 +16,7 @@ router.get('/', (req, res, next) => {
         res.status(500).json({ error: err });
     });
 });
-router.get('/:_report_id', (req, res, next) => {
+router.get('/id/:_report_id', (req, res, next) => {
     const _report_id = req.params._report_id;
     const params = [_report_id];
     executeF("vision_data", "get_report", params)
@@ -27,7 +27,7 @@ router.get('/:_report_id', (req, res, next) => {
         res.status(500).json({ error: err });
     });
 });
-router.get('/:_report_id/classes', (req, res, next) => {
+router.get('/id/:_report_id/classes', (req, res, next) => {
     const _report_id = req.params._report_id;
     const params = [_report_id];
     executeF("vision_data", "get_report_classes", params)
@@ -38,7 +38,7 @@ router.get('/:_report_id/classes', (req, res, next) => {
         res.status(500).json({ error: err });
     });
 });
-router.get('/:_report_id/graph', (req, res, next) => {
+router.get('/id/:_report_id/graph', (req, res, next) => {
     const _report_id = req.params._report_id;
     const params = [_report_id];
     executeF("vision_data", "get_graph_id", params)
@@ -49,7 +49,7 @@ router.get('/:_report_id/graph', (req, res, next) => {
         res.status(500).json({ error: err });
     });
 });
-router.get('/:_report_id/data', (req, res, next) => {
+router.get('/id/:_report_id/data', (req, res, next) => {
     const _start_date = req.query._start_date;
     const _end_date = req.query._end_date;
     const _class_ids = req.query._class_ids;

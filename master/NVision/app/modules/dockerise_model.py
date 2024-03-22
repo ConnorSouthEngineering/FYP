@@ -3,6 +3,7 @@ import getpass
 import requests
 import docker
 from time import sleep
+import shutil
 
 async def get_task_data(task_id):
     task_result = requests.get(f"http://localhost:3000/tasks/{task_id}")
@@ -57,11 +58,11 @@ async def launch_container(image_tag, task_id, folder_name):
                             stdin_open=True, 
                             entrypoint=entry_cmd,
                             volumes=volume_mapping)
-        file = 'config.pbtxt'
+        file = f'{model_name}_training_confusion.png'
         file_status = False
         while not file_status:
             present_files = []
-            path = f'../model_repo/{model_name}/{file}'
+            path = f'../model_repo/{model_name}/1/model.savedmodel/assets/{file}'
             if os.path.exists(path):
                 if os.path.isfile(path):
                     file_status = True
@@ -73,13 +74,13 @@ async def launch_container(image_tag, task_id, folder_name):
                 print("files missing")
         container.stop()
         container.remove()
-        return True
+        return [True,model_name]
     except docker.errors.ContainerError as e:
         print(f"Container run error: {e}")
-        return False
+        return [False,model_name]
     except docker.errors.ImageNotFound as e:
         print(f"Image not found error: {e}")
-        return False
+        return [False,model_name]
     except docker.errors.APIError as e:
         print(f"Docker API error: {e}")
-        return False
+        return [False,model_name]

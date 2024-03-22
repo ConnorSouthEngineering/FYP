@@ -130,7 +130,9 @@ def reorganise_folder(model_name, folder_path, repo_path):
     variables_files = os.listdir(f"{folder_path}/{model_name}/variables")
     base_files = os.listdir(f"{folder_path}/{model_name}")
     directories_path = f"{folder_path}/{model_name}/1/model.savedmodel/variables"
+    assets_path = f"{folder_path}/{model_name}/1/model.savedmodel/assets"
     os.makedirs(directories_path)
+    os.makedirs(assets_path)
     for file in variables_files:
         print(file)
         os.replace(f"{folder_path}/{model_name}/variables/{file}", f"{folder_path}/{model_name}/1/model.savedmodel/variables/{file}")
@@ -142,8 +144,10 @@ def reorganise_folder(model_name, folder_path, repo_path):
     os.removedirs(f"{folder_path}/{model_name}/assets")
     os.removedirs(f"{folder_path}/{model_name}/variables")
     shutil.copytree(f"{folder_path}/{model_name}", f"{repo_path}/{model_name}")
-
-
+    shutil.move(f"{folder_path}/{model_name}.config", f"{repo_path}/{model_name}/1/model.savedmodel/assets")
+    shutil.move(f"{folder_path}/{model_name}_history.png", f"{repo_path}/{model_name}/1/model.savedmodel/assets")
+    shutil.move(f"{folder_path}/{model_name}_test_confusion.png", f"{repo_path}/{model_name}/1/model.savedmodel/assets")
+    shutil.move(f"{folder_path}/{model_name}_training_confusion.png", f"{repo_path}/{model_name}/1/model.savedmodel/assets")
 
 def create_triton_package(labels, model_name, folder_path, repo_path, epochs, num_frames, shuffle_size, batch_size, height, width):
     create_triton_config(model_name, folder_path)

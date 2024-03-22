@@ -54,14 +54,16 @@ export class SessionsComponent implements OnInit {
         console.log("Fetched data:", data);
         const deployments = data.flatMap(item => item.get_latest_deployments).map(deployment => {
           return new Deployment(
-            deployment.deployment_id.toString(), 
+            deployment.deployment_id, 
             deployment.deployment_name,
-            deployment.target_id.toString(),
+            deployment.target_id,
             deployment.status_value,
-            deployment.model_id.toString(),
+            deployment.model_id,
             new Date(deployment.creation_date), 
             new Date(deployment.start_date),
-            new Date(deployment.expiry_date)
+            new Date(deployment.expiry_date),
+            deployment.node_id,
+            deployment.device_id
           );
         });
         this.deploymentSessions = deployments;

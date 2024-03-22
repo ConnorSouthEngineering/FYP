@@ -148,7 +148,9 @@ CREATE TABLE Deployments(
     model_id INT REFERENCES Models(model_id) NOT NULL,
     creation_date DATE NOT NULL,
     start_date DATE NOT NULL,
-    expiry_date DATE NOT NULL
+    expiry_date DATE NOT NULL,
+    node_id INT REFERENCES Nodes(node_id) NOT NULL,
+    device_id INT REFERENCES Devices(device_id) NOT NULL
 );
 
 CREATE TABLE GraphMap(

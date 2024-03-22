@@ -9,19 +9,21 @@ import os
 from modules.gstreamer import update_system_cameras, manage_pipelines, initialise_gstreamer, display_sinks, get_path_camera
 from modules.connection import configure_connection, connect_devices
 from modules.inference import initialise_inference
-from modules.deployments import get_device_id
+from modules.deployments import retrieve_active_deployments
 from modules.classes import PipelineStorage
 
 cameras = []
 pipelines = PipelineStorage()
 active_infernce = {}
 
-async def retrieve_active_deployments(camera):
-    print(camera)
-    camera_id_task = loop.create_task(get_device_id(camera))
-    await camera_id_task
+async def intercept_launch_inference(request):
+    body = await request.json()
+    deployment_model = body[0]['initialise_deployment']
+    inference_task = loop.create_task(launch_inference(deployment_model))
+    await inference_task
+    return web.Response(text="Inference launched", content_type='application/json')
 
-async def launch_inference(request):
+async def launch_inference(deployment_id, model_id, pipeline):
     global pipelines
     pipeline_info = pipelines.get_pipeline("vi-output, ar0230 30-0043")
     sink_name = "sink_initialisation"
@@ -56,7 +58,7 @@ async def server_up():
     server = '0.0.0.0'
     port = 2500
     app = web.Application()
-    app.add_routes([web.post('/triton/initialise_deployment', launch_inference)])
+    app.add_routes([web.post('/triton/initialise_deployment', intercept_launch_inference)])
     app.add_routes([web.get('/node/available', available_node)])
     app.add_routes([web.get('/node/cameras', get_cameras)])
     runner = web.AppRunner(app)
@@ -86,12 +88,6 @@ async def server_up():
         await display_task
         if display_task.result() == 'Displayed':
             print("Device pipelines initialised successfully")
-            for pipeline in pipelines:
-                match_camera_task = loop.create_task(get_path_camera(pipeline))
-                await match_camera_task
-
-                node_deployments_task = loop.create_task(retrieve_active_deployments(match_camera_task.result()))
-                await node_deployments_task
         else:
             print("Device pipeline(s) failed to initialise")
             for error in display_task.result():
@@ -117,7 +113,13 @@ async def server_up():
             await display_task
             if display_task.result() == 'Displayed':
                 print("Device pipelines initialised successfully")
-                print(pipelines.display_all_pipelines())
+                for pipeline in pipelines:
+                    match_camera_task = loop.create_task(get_path_camera(pipeline))
+                    await match_camera_task
+
+                    node_deployments_task = loop.create_task(retrieve_active_deployments(match_camera_task.result()))
+                    await node_deployments_task                    
+                    deployments = node_deployments_task.result()
             else:
                 print("Device pipeline(s) failed to initialise")
                 for error in display_task.result():

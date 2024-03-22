@@ -11,7 +11,7 @@ export class GetGraphService {
 
   getGraphId(_report_id: string): Observable<any[]> {
 
-    const url = `http://localhost:3000/reports/${_report_id}/graph`;
+    const url = `http://localhost:3000/reports/id/${_report_id}/graph`;
 
     return this.http.get<any[]>(url);
   }

@@ -4,7 +4,7 @@
             public target_name: string,
             public alt_name: string,
             public creation_date: Date,
-            public status_value: 'Active' | 'Complete' | 'Expiring' | 'Error' | 'New',
+            public status_value: 'Active' | 'Complete' | 'Expiring' | 'Error' | 'New' | 'Disabled',
         ) {}
     }
 
@@ -18,7 +18,7 @@
             target_name: string, 
             alt_name: string, 
             creation_date: Date, 
-            status_value: 'Active' | 'Complete' | 'Expiring' | 'Error' | 'New',
+            status_value: 'Active' | 'Complete' | 'Expiring' | 'Error' | 'New' | 'Disabled',
             dob: Date, 
             role: string) 
             {
@@ -46,7 +46,7 @@
             target_name: string,
             alt_name: string,
             creation_date: Date,
-            status_value: 'Active' | 'Complete' | 'Expiring' | 'Error' | 'New',
+            status_value: 'Active' | 'Complete' | 'Expiring' | 'Error' | 'New' | 'Disabled',
             public access: 'public' | 'private' | null)     
             {
             super(target_id,target_name, alt_name, creation_date, status_value);
@@ -121,14 +121,16 @@
 
 export class Deployment {
     constructor(
-        public deployment_id: string,
+        public deployment_id: number,
         public deployment_name: string,
         public target_id: string,
-        public status_value: 'Active' | 'Complete' | 'Expiring' | 'Error',
+        public status_value: 'Active' | 'Complete' | 'Expiring' | 'Error' | 'New' | 'Disabled',
         public model_id: string,
         public creation_date: Date,
         public start_date: Date,
-        public expiry_date: Date
+        public expiry_date: Date,
+        public node_id: number,
+        public device_id: number
     ){}
 
     get running_time(): number {

@@ -38,5 +38,16 @@ router.get('/', (req, res, next) => {
         res.status(500).json({ error: err });
     });
 });
+router.get('/id/:model_id', (req, res, next) => {
+    const _model_id = req.params.model_id;
+    const params = [_model_id];
+    executeF("vision_data", "get_model", params)
+        .then(result => {
+        res.status(200).json(result);
+    })
+        .catch(err => {
+        res.status(500).json({ error: err });
+    });
+});
 module.exports = router;
 //# sourceMappingURL=models.js.map

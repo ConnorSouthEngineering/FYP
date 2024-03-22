@@ -11,7 +11,7 @@ export class GetReportService {
 
   getReportData(_report_id: string): Observable<any[]> {
 
-    const url = `http://localhost:3000/reports/${_report_id}`;
+    const url = `http://localhost:3000/reports/id/${_report_id}`;
 
     return this.http.get<any[]>(url);
   }
