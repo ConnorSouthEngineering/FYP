@@ -50,7 +50,6 @@ async def connect_devices(json_body):
     else:
         return "Error"
     
-
 async def configure_connection():
     abs_path = f'/home/{getpass.getuser()}/Desktop/FYP/node/XInference/node.conf'
     node_config = configparser.ConfigParser()

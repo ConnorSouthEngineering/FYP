@@ -6,14 +6,20 @@ import sys
 import getpass
 import os
 
-from modules.gstreamer import update_system_cameras, manage_pipelines, initialise_gstreamer, display_sinks
+from modules.gstreamer import update_system_cameras, manage_pipelines, initialise_gstreamer, display_sinks, get_path_camera
 from modules.connection import configure_connection, connect_devices
 from modules.inference import initialise_inference
+from modules.deployments import get_device_id
 from modules.classes import PipelineStorage
 
 cameras = []
 pipelines = PipelineStorage()
 active_infernce = {}
+
+async def retrieve_active_deployments(camera):
+    print(camera)
+    camera_id_task = loop.create_task(get_device_id(camera))
+    await camera_id_task
 
 async def launch_inference(request):
     global pipelines
@@ -67,18 +73,25 @@ async def server_up():
 
         ### Please not the below is only for debugging and development purposes when the master server is off and should be removed when in a fit state
         node_devices = await get_cameras("manual")
+
         gstreamer_task = loop.create_task(initialise_gstreamer())
         await gstreamer_task
         gloop = gstreamer_task.result()
+
         pipeline_task = loop.create_task(manage_pipelines(node_devices, gloop))
         await pipeline_task
-        
         pipelines = pipeline_task.result()
+        
         display_task = loop.create_task(display_sinks(pipelines))
         await display_task
         if display_task.result() == 'Displayed':
             print("Device pipelines initialised successfully")
-            print(pipelines.display_all_pipelines())
+            for pipeline in pipelines:
+                match_camera_task = loop.create_task(get_path_camera(pipeline))
+                await match_camera_task
+
+                node_deployments_task = loop.create_task(retrieve_active_deployments(match_camera_task.result()))
+                await node_deployments_task
         else:
             print("Device pipeline(s) failed to initialise")
             for error in display_task.result():

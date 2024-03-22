@@ -99,6 +99,32 @@ def get_camera_path(camera):
     camera_path = props.get_string("device.path")
     return camera_path
 
+
+def extract_camera_path(pipeline):
+    elements = pipeline.iterate_elements()
+    while True:
+        result, element = elements.next()
+        if result == Gst.IteratorResult.DONE:
+            break
+        elif result == Gst.IteratorResult.OK:
+            if element.get_factory() and 'nvv4l2camerasrc' in element.get_factory().get_name():
+                return element.get_property("device")
+
+async def get_path_camera(pipeline):
+    camera_path_element = extract_camera_path(pipeline)
+    monitor = Gst.DeviceMonitor()
+    video_filter = Gst.Caps.from_string("video/x-raw")
+    monitor.add_filter("Video/Source", video_filter)
+    monitor.start()
+    device_obj = None
+    for device in monitor.get_devices():
+        if device.get_properties().get_string("device.path") == camera_path_element:
+            device_obj = device
+            break
+    monitor.stop()
+    camera_name = device_obj.get_display_name()
+    return camera_name
+
 async def initialise_pipeline(camera, gloop):
     global pipelines
     camera_path = get_camera_path(camera)
