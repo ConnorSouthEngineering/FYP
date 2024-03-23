@@ -3,13 +3,14 @@ import numpy as np
 import tritonclient.http as httpclient
 from tritonclient.utils import InferenceServerException
 from collections import deque
+from PIL import Image
+
 import gi
-import pdb
 gi.require_version('Gst','1.0')
 from gi.repository import Gst, GLib
-from PIL import Image
-from time import sleep
 Gst.init(None)
+
+from .gstreamer import get_pipeline_state
 
 def preprocess_frames(frame, WIDTH, HEIGHT):
     frame_resized = cv2.resize(frame, (WIDTH, HEIGHT))
@@ -28,21 +29,16 @@ async def initialise_inference(pipeline, sink_name, height, width, class_list, s
     if not appsink:
         print("Appsink not found.")
         return
-    print(get_pipeline_state(pipeline))
+
     frames_queue = deque(maxlen=sequence_length)
-    state = get_pipeline_state(pipeline)
-    if state != Gst.State.PLAYING:
+    if get_pipeline_state(pipeline) != Gst.State.PLAYING:
         print("Pipeline in incorrect state restart the node")
         return
-    print(get_pipeline_state(pipeline))
+
     print("Pipeline and sink were correctly retrieved")
     print(f"Inference for {sink_name} with model {model_name} is occuring")
     GLib.timeout_add_seconds(1, pull_frame, pipeline, appsink, sink_name, frames_queue, int(width), int(height), sequence_length, triton_client, model_name, class_list)
     return
-
-def get_pipeline_state(pipeline):
-    state_change, current_state, pending_state = pipeline.get_state(Gst.CLOCK_TIME_NONE)
-    return current_state
 
 def pull_frame(pipeline, appsink, sink_name, frames_queue, width, height, sequence_length, triton_client, model_name, class_list):
     
@@ -81,7 +77,7 @@ def pull_frame(pipeline, appsink, sink_name, frames_queue, width, height, sequen
             response = triton_client.infer(model_name, inputs=[input_tensor])                
             output_data = response.as_numpy('dense')
             predicted_class = class_list[np.argmax(output_data)]
-            predicted_class = class_list[np.argmax(output_data)]
+            print(f"Deployment_sink: {sink_name} Predicted class: {predicted_class}")
         except InferenceServerException as e:
             print(f"InferenceServerException: {str(e)}")
         frames_queue.clear() 

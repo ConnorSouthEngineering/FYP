@@ -15,9 +15,6 @@ from modules.classes import PipelineStorage
 camera_task = None
 pipelines = PipelineStorage()
 
-def pad_added_handler(src,new_pad,data):
-    print("Pad added;", new_pad.get_name())
-
 async def initialise_gstreamer():
     Gst.init(None)
     loop = GLib.MainLoop()
@@ -48,9 +45,6 @@ def get_pipeline_state(pipeline):
 
 def add_sink(pipeline, deployment_name, tee, gloop_state):
     Gst.debug_bin_to_dot_file(pipeline, Gst.DebugGraphDetails.ALL, f"pipeline_before_{deployment_name}")
-    if get_pipeline_state(pipeline) == Gst.State.PAUSED:
-        ret = pipeline.set_state(Gst.State.PLAYING)
-        print(f"Setting queue to PLAYING returned: {ret}")
     queue = Gst.ElementFactory.make("queue", f"queue_{deployment_name}")
     queue.set_property("leaky", 2)
     queue.set_property("max-size-buffers", 5)
@@ -85,18 +79,7 @@ def add_sink(pipeline, deployment_name, tee, gloop_state):
     sink_pad = queue.get_static_pad("sink")
     if src_pad.link(sink_pad) != Gst.PadLinkReturn.OK:
         print("Failed to link tee to queue")
-    if gloop_state:
-        print("Setting individual elements to PAUSED state and printing return values:")
-        ret = queue.set_state(Gst.State.PAUSED)
-        print(f"Setting queue to PAUSED returned: {ret}")
-        ret = videoconvert.set_state(Gst.State.PAUSED)
-        print(f"Setting videoconvert to PAUSED returned: {ret}")
-        ret = videoscale.set_state(Gst.State.PAUSED)
-        print(f"Setting videoscale to PAUSED returned: {ret}")
-        ret = sink.set_state(Gst.State.PAUSED)
-        print(f"Setting sink to PAUSED returned: {ret}")
-    # Sync state with parent after adding to pipeline and linking
-    print("Syncing state with parent and printing return values:")
+    
     ret = queue.sync_state_with_parent()
     print(f"Syncing queue state with parent returned: {ret}")
     ret = videoconvert.sync_state_with_parent()
@@ -105,7 +88,6 @@ def add_sink(pipeline, deployment_name, tee, gloop_state):
     print(f"Syncing videoscale state with parent returned: {ret}")
     ret = sink.sync_state_with_parent()
     print(f"Syncing sink state with parent returned: {ret}")
-    Gst.debug_bin_to_dot_file(pipeline, Gst.DebugGraphDetails.ALL, f"pipeline_after_{deployment_name}")
     if gloop_state:
         return False
     else:
@@ -139,9 +121,9 @@ async def initialise_pipeline(camera, gloop):
     return
 
 def generate_pipeline(camera_path):
-    pipeline = Gst.Pipeline.new("dynamic-pipeline")
+    pipeline = Gst.Pipeline.new(f"dynamic-pipeline-{camera_path}")
     source = Gst.ElementFactory.make("nvv4l2camerasrc", "source")
-    source.set_property("device", "/dev/video0")
+    source.set_property("device", camera_path)
     capsfilter = Gst.ElementFactory.make("capsfilter", "caps")
     caps = Gst.Caps.from_string("video/x-raw(memory:NVMM), format=(string)UYVY, width=(int)1920, height=(int)1080, framerate=(fraction)30/1")
     capsfilter.set_property("caps", caps)
@@ -184,10 +166,8 @@ async def manage_pipelines(node_devices, gloop):
 async def display_sinks(pipelines):
     initialisation_errors = []
     for pipeline_name, pipeline_info in pipelines.items():
-        print(pipeline_name)
         try:
             gst_pipeline = pipeline_info['pipeline'] 
-            get_pipeline_state(gst_pipeline)
             Gst.debug_bin_to_dot_file(gst_pipeline, Gst.DebugGraphDetails.ALL, f"pipeline_{pipeline_name}_before_state")
             gst_pipeline.set_state(Gst.State.PLAYING)
             Gst.debug_bin_to_dot_file(gst_pipeline, Gst.DebugGraphDetails.ALL, f"pipeline_{pipeline_name}_after_state")

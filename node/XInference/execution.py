@@ -4,44 +4,12 @@ import json
 import configparser
 import sys
 import getpass
-import os
-import ast
-import builtins
-from datetime import datetime
-import pdb
 import gi
 gi.require_version('Gst','1.0')
-from gi.repository import Gst, GLib
+from gi.repository import Gst
 Gst.init(None)
-# Save the original print function
-import builtins
-import time
 
-# Record the start time
-start_time = time.time()
-
-# Ensure we save the original print function before it gets overridden
-# to prevent any recursion with our custom print function.
-_original_print = builtins.print
-
-def timestamped_print(*args, **kwargs):
-    elapsed_time = time.time() - start_time
-    # Format the elapsed time. The formatting here is to match your requested output as closely as possible.
-    hours, remainder = divmod(elapsed_time, 3600)
-    minutes, seconds = divmod(remainder, 60)
-    # Now using _original_print to ensure we call the true original print function.
-    _original_print(f"{int(hours)}:{int(minutes):02d}:{seconds:09.6f}", *args, **kwargs)
-
-# Override the built-in print with our custom function
-builtins.print = timestamped_print
-
-# Example usage
-print("This is a test message with a timestamp.")
-os.environ["GST_DEBUG_DUMP_DOT_DIR"] = "./"
-
-# Now every print call will include a timestamp
-print("Hello, world!")
-from modules.gstreamer import update_system_cameras, manage_pipelines, initialise_gstreamer, display_sinks, add_new_sink
+from modules.gstreamer import update_system_cameras, manage_pipelines, initialise_gstreamer, display_sinks, add_new_sink, get_pipeline_state
 from modules.connection import configure_connection, connect_devices
 from modules.inference import initialise_inference
 from modules.deployments import retrieve_active_deployments, get_model, gather_model_information, extract_list_from_string
@@ -68,63 +36,20 @@ async def launch_inference(deployment_id, model_id, pipeline, name, tee):
     deployment_name = f"deployment_{deployment_id}"
     height, width, config_classes = await gather_model_information(triton_location_name)   
     class_list = await extract_list_from_string(config_classes)
+    if not get_pipeline_state(pipeline) == Gst.State.PLAYING:
+        ret = pipeline.set_state(Gst.State.PLAYING)
+        print(f"Setting queue to PLAYING returned: {ret}")
     create_sink_task = loop.create_task(add_new_sink(pipeline, deployment_name, tee))
     while True:
         appsink = pipeline.get_by_name(f'sink_{deployment_name}')
-        queue = pipeline.get_by_name(f'queue_{deployment_name}')
-        videoconvert = pipeline.get_by_name(f'videoconvert_{deployment_name}')
-        videoscale = pipeline.get_by_name(f'videoscale_{deployment_name}')
         if not appsink:
             print("Appsink not found.")
         else:
-            print("Pre set state")
-            current_state = appsink.get_state(2)
-            print(current_state)
-            current_state = queue.get_state(2)
-            print(current_state)
-            current_state = videoconvert.get_state(2)
-            print(current_state)
-            current_state = videoscale.get_state(2)
-            print(current_state)
-            queue.set_state(Gst.State.PLAYING)
-            videoconvert.set_state(Gst.State.PLAYING)
-            videoscale.set_state(Gst.State.PLAYING)
-            appsink.set_state(Gst.State.PLAYING)
-            print("Post set state")
-            current_state = appsink.get_state(2)
-            print(current_state)
-            current_state = queue.get_state(2)
-            print(current_state)
-            current_state = videoconvert.get_state(2)
-            print(current_state)
-            current_state = videoscale.get_state(2)
-            print(current_state)
-            appsink.set_state(Gst.State.PLAYING)
-            await asyncio.sleep(10)
-            print("Post sleep state")
-            current_state = appsink.get_state(2)
-            print(current_state)
-            current_state = queue.get_state(2)
-            print(current_state)
-            current_state = videoconvert.get_state(2)
-            print(current_state)
-            current_state = videoscale.get_state(2)
-            print(current_state)
-            Gst.debug_bin_to_dot_file(pipeline, Gst.DebugGraphDetails.ALL, f"DEBUG_{deployment_name}")
             break
         await asyncio.sleep(1)
-    loop.create_task(initialise_inference(pipeline, f'sink_{deployment_name}', int(height), int(width), class_list, num_frames, triton_location_name))
-    print("test")  
     inference_task = loop.create_task(initialise_inference(pipeline, f'sink_{deployment_name}', int(height), int(width), class_list, num_frames, triton_location_name))
     await inference_task
     return
-
-async def a_launch_inference(deployment_id, model_id, pipeline):
-    global pipelines
-    pipeline_info = pipelines.get_pipeline("vi-output, ar0230 30-0043")
-    sink_name = "sink_initialisation"
-    inference_task = loop.create_task(initialise_inference(pipeline_info["pipeline"], sink_name))
-    return web.Response(text="Inference launched", content_type='application/json')
 
 async def available_node(request):
     return web.Response(text="Available")
@@ -163,8 +88,6 @@ async def execute_deployment_pipeline(name, pipeline, tee):
     return
 
 async def server_up():
-    os.environ["GST_DEBUG_DUMP_DOT_DIR"] = "/tmp"
-    os.putenv('GST_DEBUG_DUMP_DIR_DIR', '/tmp')
     server = '0.0.0.0'
     port = 2500
     app = web.Application()
@@ -181,29 +104,7 @@ async def server_up():
     global pipelines
     if connection_task.result() == 'isolated':
         print("The node cannot connect securely with the master server")    
-        print(f"This server has been launched in isolated mode: http://0.0.0.0:2500")
-
-        ### Please not the below is only for debugging and development purposes when the master server is off and should be removed when in a fit state
-        node_devices = await get_cameras("manual")
-
-        gstreamer_task = loop.create_task(initialise_gstreamer())
-        await gstreamer_task
-        gloop = gstreamer_task.result()
-
-        pipeline_task = loop.create_task(manage_pipelines(node_devices, gloop))
-        await pipeline_task
-        pipelines = pipeline_task.result()
-        
-        display_task = loop.create_task(display_sinks(pipelines))
-        await display_task
-        if display_task.result() == 'Displayed':
-            print("Device pipelines initialised successfully")
-        else:
-            print("Device pipeline(s) failed to initialise")
-            for error in display_task.result():
-                print(error)
-            sys.exit(1)
-
+        sys.exit(1)
     elif connection_task.result() == 'remote':
         print("The node has connected securely with the master server")    
         print(f"This server has been launched in remote mode: http://0.0.0.0:2500")
@@ -211,7 +112,6 @@ async def server_up():
         device_connection_task = loop.create_task(connect_devices(node_devices))
         await device_connection_task
         if device_connection_task.result() == 'Synced':
-            ### Please not the below is only for debugging and development purposes when the master server is off and should be removed when in a fit state
             node_devices = await get_cameras("manual")
             gstreamer_task = loop.create_task(initialise_gstreamer())
             await gstreamer_task
@@ -223,13 +123,13 @@ async def server_up():
             await display_task
             if display_task.result() == 'Displayed':
                 print("Device pipelines initialised successfully")
-                print(pipelines.display_all_pipelines())
+                print(pipelines.display_all_pipelines())                
                 for name, info in pipelines.items():
                     print("Processing deployment pipeline: "+name)
                     pipeline = info['pipeline'] 
                     tee = info['tee']
                     deployments_pipeline = loop.create_task(execute_deployment_pipeline(name, pipeline, tee))
-                    await deployments_pipeline
+                    await deployments_pipeline       
             else:
                 print("Device pipeline(s) failed to initialise")
                 for error in display_task.result():
@@ -251,7 +151,4 @@ if __name__ == "__main__":
     loop.run_until_complete(main())
     loop.run_forever()
 
-""" loop = asyncio.get_event_loop()
-loop.run_until_complete(main())
-loop.run_forever() """
 

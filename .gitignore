@@ -7,4 +7,5 @@ node/XInference/*.conf
 node/XInference/triton_inference_test.py
 node/Triton/extras
 master/VisionLinkAPI/config.json
+master/VisionLinkAPI/node_modules/*
 Excess
