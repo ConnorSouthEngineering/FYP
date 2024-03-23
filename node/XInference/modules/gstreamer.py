@@ -1,3 +1,6 @@
+import os
+os.environ["GST_DEBUG_DUMP_DOT_DIR"] = "./"
+os.environ["GST_DEBUG"] = "GST_STATE_DUMP:2"
 import gi
 gi.require_version('Gst','1.0')
 from gi.repository import Gst, GLib
@@ -12,9 +15,8 @@ from modules.classes import PipelineStorage
 camera_task = None
 pipelines = PipelineStorage()
 
-def get_pipeline_state(pipeline):
-    state_change, current_state, pending_state = pipeline.get_state(Gst.CLOCK_TIME_NONE)
-    return current_state
+def pad_added_handler(src,new_pad,data):
+    print("Pad added;", new_pad.get_name())
 
 async def initialise_gstreamer():
     Gst.init(None)
@@ -45,8 +47,10 @@ def get_pipeline_state(pipeline):
     return current_state
 
 def add_sink(pipeline, deployment_name, tee, gloop_state):
-    if get_pipeline_state(pipeline) == Gst.State.PLAYING:
-        pipeline.set_state(Gst.State.PAUSED)
+    Gst.debug_bin_to_dot_file(pipeline, Gst.DebugGraphDetails.ALL, f"pipeline_before_{deployment_name}")
+    if get_pipeline_state(pipeline) == Gst.State.PAUSED:
+        ret = pipeline.set_state(Gst.State.PLAYING)
+        print(f"Setting queue to PLAYING returned: {ret}")
     queue = Gst.ElementFactory.make("queue", f"queue_{deployment_name}")
     queue.set_property("leaky", 2)
     queue.set_property("max-size-buffers", 5)
@@ -62,38 +66,47 @@ def add_sink(pipeline, deployment_name, tee, gloop_state):
 
     if not all([queue, videoconvert, videoscale, sink]):
         print("Failed to create elements for new sink")
-        return pipeline
-
-    queue.set_state(Gst.State.PAUSED)
-    videoconvert.set_state(Gst.State.PAUSED)
-    videoscale.set_state(Gst.State.PAUSED)
-    sink.set_state(Gst.State.PAUSED)
+        return
 
     pipeline.add(queue)
     pipeline.add(videoconvert)
     pipeline.add(videoscale)
     pipeline.add(sink)
 
-    if not Gst.Element.link(queue, videoconvert):
+    if not queue.link(videoconvert):
         print("Failed to link queue to videoconvert")
-    if not Gst.Element.link(videoconvert, videoscale):
+    if not videoconvert.link(videoscale):
         print("Failed to link videoconvert to videoscale")
-    if not Gst.Element.link(videoscale, sink):
+    if not videoscale.link(sink):
         print("Failed to link videoscale to sink")
 
     pad_template = tee.get_pad_template("src_%u")
     src_pad = tee.request_pad(pad_template, None, None)
     sink_pad = queue.get_static_pad("sink")
-    if not src_pad.link(sink_pad) == Gst.PadLinkReturn.OK:
+    if src_pad.link(sink_pad) != Gst.PadLinkReturn.OK:
         print("Failed to link tee to queue")
-    queue.sync_state_with_parent()
-    videoconvert.sync_state_with_parent()
-    videoscale.sync_state_with_parent()
-    sink.sync_state_with_parent()
-
     if gloop_state:
-        print(get_pipeline_state(pipeline))
-        pipeline.set_state(Gst.State.PLAYING)
+        print("Setting individual elements to PAUSED state and printing return values:")
+        ret = queue.set_state(Gst.State.PAUSED)
+        print(f"Setting queue to PAUSED returned: {ret}")
+        ret = videoconvert.set_state(Gst.State.PAUSED)
+        print(f"Setting videoconvert to PAUSED returned: {ret}")
+        ret = videoscale.set_state(Gst.State.PAUSED)
+        print(f"Setting videoscale to PAUSED returned: {ret}")
+        ret = sink.set_state(Gst.State.PAUSED)
+        print(f"Setting sink to PAUSED returned: {ret}")
+    # Sync state with parent after adding to pipeline and linking
+    print("Syncing state with parent and printing return values:")
+    ret = queue.sync_state_with_parent()
+    print(f"Syncing queue state with parent returned: {ret}")
+    ret = videoconvert.sync_state_with_parent()
+    print(f"Syncing videoconvert state with parent returned: {ret}")
+    ret = videoscale.sync_state_with_parent()
+    print(f"Syncing videoscale state with parent returned: {ret}")
+    ret = sink.sync_state_with_parent()
+    print(f"Syncing sink state with parent returned: {ret}")
+    Gst.debug_bin_to_dot_file(pipeline, Gst.DebugGraphDetails.ALL, f"pipeline_after_{deployment_name}")
+    if gloop_state:
         return False
     else:
         return pipeline
@@ -174,7 +187,11 @@ async def display_sinks(pipelines):
         print(pipeline_name)
         try:
             gst_pipeline = pipeline_info['pipeline'] 
+            get_pipeline_state(gst_pipeline)
+            Gst.debug_bin_to_dot_file(gst_pipeline, Gst.DebugGraphDetails.ALL, f"pipeline_{pipeline_name}_before_state")
             gst_pipeline.set_state(Gst.State.PLAYING)
+            Gst.debug_bin_to_dot_file(gst_pipeline, Gst.DebugGraphDetails.ALL, f"pipeline_{pipeline_name}_after_state")
+            get_pipeline_state(gst_pipeline)
         except Exception as e:
             initialisation_errors.append(e)
     if initialisation_errors:

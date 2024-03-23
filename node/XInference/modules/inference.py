@@ -3,6 +3,9 @@ import numpy as np
 import tritonclient.http as httpclient
 from tritonclient.utils import InferenceServerException
 from collections import deque
+import gi
+import pdb
+gi.require_version('Gst','1.0')
 from gi.repository import Gst, GLib
 from PIL import Image
 from time import sleep
@@ -14,6 +17,7 @@ def preprocess_frames(frame, WIDTH, HEIGHT):
     return frame_rgb.astype('float32') / 255.0  
 
 async def initialise_inference(pipeline, sink_name, height, width, class_list, sequence_length, model_name):
+    print(get_pipeline_state(pipeline))
     triton_url = 'localhost:8000'
     triton_client = httpclient.InferenceServerClient(url=triton_url)
     if not isinstance(pipeline, Gst.Pipeline):
@@ -24,13 +28,13 @@ async def initialise_inference(pipeline, sink_name, height, width, class_list, s
     if not appsink:
         print("Appsink not found.")
         return
-    
+    print(get_pipeline_state(pipeline))
     frames_queue = deque(maxlen=sequence_length)
     state = get_pipeline_state(pipeline)
     if state != Gst.State.PLAYING:
         print("Pipeline in incorrect state restart the node")
         return
-        
+    print(get_pipeline_state(pipeline))
     print("Pipeline and sink were correctly retrieved")
     print(f"Inference for {sink_name} with model {model_name} is occuring")
     GLib.timeout_add_seconds(1, pull_frame, pipeline, appsink, sink_name, frames_queue, int(width), int(height), sequence_length, triton_client, model_name, class_list)
