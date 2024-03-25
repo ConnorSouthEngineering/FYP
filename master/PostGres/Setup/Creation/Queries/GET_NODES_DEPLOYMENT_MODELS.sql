@@ -10,7 +10,8 @@ BEGIN
     FROM deployments
     WHERE _current_date BETWEEN start_date AND expiry_date
     AND node_id = _node_id
-    AND device_id = _device_id;
+    AND device_id = _device_id
+    AND status_value != 'Disabled';
 
     IF result_json IS NULL THEN
         result_json := '{"deployments": []}';
