@@ -44,7 +44,6 @@ def get_pipeline_state(pipeline):
     return current_state
 
 def add_sink(pipeline, deployment_name, tee, gloop_state):
-    Gst.debug_bin_to_dot_file(pipeline, Gst.DebugGraphDetails.ALL, f"pipeline_before_{deployment_name}")
     queue = Gst.ElementFactory.make("queue", f"queue_{deployment_name}")
     queue.set_property("leaky", 2)
     queue.set_property("max-size-buffers", 5)
@@ -120,32 +119,74 @@ async def initialise_pipeline(camera, gloop):
     pipelines.add_pipeline(camera, "initialisation", pipeline, tee)
     return
 
+##Pipeline involving GPU optimised transition between UVYV to RGBA
 def generate_pipeline(camera_path):
     pipeline = Gst.Pipeline.new(f"dynamic-pipeline-{camera_path}")
     source = Gst.ElementFactory.make("nvv4l2camerasrc", "source")
     source.set_property("device", camera_path)
-    capsfilter = Gst.ElementFactory.make("capsfilter", "caps")
+
+    nvvidconv_UYVY = Gst.ElementFactory.make("nvvidconv", "nvvidconv_UYVY")
+
+    capsfilter_UYVY = Gst.ElementFactory.make("capsfilter", "caps")
     caps = Gst.Caps.from_string("video/x-raw(memory:NVMM), format=(string)UYVY, width=(int)1920, height=(int)1080, framerate=(fraction)30/1")
+    capsfilter_UYVY.set_property("caps", caps)
+
+    nvvidconv_RGBA = Gst.ElementFactory.make("nvvidconv", "nvvidconv_RGBA")
+    capsfilter_RGBA = Gst.ElementFactory.make("capsfilter", "RGBA_caps")
+    caps_RGBA = Gst.Caps.from_string("video/x-raw, format=(string)RGBA")
+    capsfilter_RGBA.set_property("caps", caps_RGBA)
+
+    tee = Gst.ElementFactory.make("tee", "tee")
+
+    pipeline.add(source)
+    pipeline.add(nvvidconv_UYVY)
+    pipeline.add(capsfilter_UYVY)
+    pipeline.add(nvvidconv_RGBA)
+    pipeline.add(capsfilter_RGBA)
+    pipeline.add(tee)
+
+    if not source.link(nvvidconv_UYVY):
+        print("Failed to link source to nvvidconv_UYVY")
+    elif not nvvidconv_UYVY.link(capsfilter_UYVY):
+        print("Failed to link nvvidconv_UYVY to capsfilter_UYVY")
+    elif not capsfilter_UYVY.link(nvvidconv_RGBA):
+        print("Failed to link capsfilter_UYVY to nvvidconv_RGBA")
+    elif not nvvidconv_RGBA.link(capsfilter_RGBA):
+        print("Failed to link nvvidconv_RGBA to capsfilter_RGBA")
+    elif not capsfilter_RGBA.link(tee):
+        print("Failed to link capsfilter_RGBA to tee")
+    else:
+        print("Elements linked successfully")
+    return pipeline, tee
+
+
+##Pipeline involving CPU optimised transition between UVYV to RGB
+def generate_pipeline_CPU(camera_path):
+    pipeline = Gst.Pipeline.new(f"dynamic-pipeline-{camera_path}")
+    source = Gst.ElementFactory.make("v4l2src", "source")
+    source.set_property("device", camera_path)
+    videoconvert_initialise = Gst.ElementFactory.make("videoconvert", "videoconvert")
+    capsfilter = Gst.ElementFactory.make("capsfilter", "caps")
+    caps = Gst.Caps.from_string("video/x-raw, format=(string)UYVY, width=(int)1920, height=(int)1080, framerate=(fraction)30/1")
     capsfilter.set_property("caps", caps)
-    nvvidconv = Gst.ElementFactory.make("nvvidconv", "nvvidconv")
-    videoconvert = Gst.ElementFactory.make("videoconvert", "videoconvert")
+    videoconvert = Gst.ElementFactory.make("videoconvert", "videoconvert2")
     rgb_capsfilter = Gst.ElementFactory.make("capsfilter", "rgb_caps")
     rgb_caps = Gst.Caps.from_string("video/x-raw, format=(string)RGB")
     rgb_capsfilter.set_property("caps", rgb_caps)
     tee = Gst.ElementFactory.make("tee", "tee")
 
     pipeline.add(source)
+    pipeline.add(videoconvert_initialise)
     pipeline.add(capsfilter)
-    pipeline.add(nvvidconv)
     pipeline.add(videoconvert)
     pipeline.add(rgb_capsfilter)
     pipeline.add(tee)
 
-    if not source.link(capsfilter):
+    if not source.link(videoconvert_initialise):
         print("Failed to link source to capsfilter")
-    elif not capsfilter.link(nvvidconv):
+    elif not videoconvert_initialise.link(capsfilter):
         print("Failed to link capsfilter to nvvidconv")
-    elif not nvvidconv.link(videoconvert):
+    elif not capsfilter.link(videoconvert):
         print("Failed to link nvvidconv to videoconvert")
     elif not videoconvert.link(rgb_capsfilter):
         print("Failed to link videoconvert to rgb_capsfilter")
@@ -163,15 +204,12 @@ async def manage_pipelines(node_devices, gloop):
             await initialise_pipeline(camera, gloop)
     return pipelines
 
-async def display_sinks(pipelines):
+async def play_pipelines(pipelines):
     initialisation_errors = []
     for pipeline_name, pipeline_info in pipelines.items():
         try:
             gst_pipeline = pipeline_info['pipeline'] 
-            Gst.debug_bin_to_dot_file(gst_pipeline, Gst.DebugGraphDetails.ALL, f"pipeline_{pipeline_name}_before_state")
             gst_pipeline.set_state(Gst.State.PLAYING)
-            Gst.debug_bin_to_dot_file(gst_pipeline, Gst.DebugGraphDetails.ALL, f"pipeline_{pipeline_name}_after_state")
-            get_pipeline_state(gst_pipeline)
         except Exception as e:
             initialisation_errors.append(e)
     if initialisation_errors:
