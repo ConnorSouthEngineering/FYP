@@ -1,5 +1,5 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { Model, ModelConfig, Task } from '../../../shared/models/Entities'
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/core';
+import { ModelConfig, Task } from '../../../shared/models/Entities'
 import { GetMapService } from '../../passive/get-maps.service';
 import { GetCategoriesService } from './get-categories.service';
 import { HandleTaskService } from './handle-task.service';
@@ -258,11 +258,6 @@ export class CreateModelsComponent {
       this.advancedSettings = false;
       this.previousButtonStatus = true;
     }
-
-/*     submitTask(){
-      this.submittedTask =  new Task(1, "test", new Date(), 'queue', [], [], 2, 2, 2, 2, 2, 2, 2);
-      console.log(this.submittedTask);
-    }; */
 
     submitTask() {
       const classes = this.convertToID();

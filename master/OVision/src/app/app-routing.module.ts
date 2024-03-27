@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { SessionsComponent } from './sessions/sessions.component';
+import { CreateDeploymentComponent } from './sessions/create-deployment/create-deployment.component';
 import { LoginComponent } from './login/login.component';
 import { HomeComponent } from './home/home.component';
 import { ReportComponent } from './reports/report/report.component';
@@ -12,7 +13,8 @@ import { CreateTargetComponent } from './targets/create-target/create-target.com
 import { ModelsComponent } from './models/models.component';
 import { CreateModelsComponent } from './models/create-models/create-models.component';
 const routes: Routes = [
-  { path: 'sessions', component: SessionsComponent },
+  { path: 'sessions/view', component: SessionsComponent },
+  { path: 'sessions/create', component: CreateDeploymentComponent},
   { path: 'login', component: LoginComponent },
   { path: 'home', component: HomeComponent },
   { path: 'reports', component: ReportsComponent },

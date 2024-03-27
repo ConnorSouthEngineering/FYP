@@ -12,7 +12,7 @@ export class TargetComponent implements OnInit {
   persons: Person[] = [];
   locations: Location[] = []
   currentPage: number = 1;
-  itemsPerPage: number = 2;
+  itemsPerPage: number = 8;
   maxLength: number = 1;
   constructor(private cdr: ChangeDetectorRef,
     private getTargetService: GetTargetService,

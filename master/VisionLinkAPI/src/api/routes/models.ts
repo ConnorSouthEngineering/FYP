@@ -16,6 +16,18 @@ router.post('/create',(req,res,next)=>{
     });
 })
 
+router.get('/id/:model_id/classes',(req,res,next)=>{
+    const _model_id = req.params.model_id
+    const params = [_model_id];
+    executeF("vision_data","get_model_classes", params)
+    .then(result => {
+        res.status(200).json(result);
+    })
+    .catch(err => {
+        res.status(500).json({error: err});
+    });
+})
+
 router.get('/categories',(req,res,next)=>{
     const params = []
     executeF("vision_data", "get_categorised_classes", params)

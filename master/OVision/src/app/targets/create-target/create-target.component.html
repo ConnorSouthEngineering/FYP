@@ -37,9 +37,9 @@
                             <label>Role:</label>
                         </div>
                         <div class="column">
-                            <input type="text" [(ngModel)]="target_name">
-                            <input type="text" [(ngModel)]="alt_name">
-                            <input type="text" [(ngModel)]="dob_entry">
+                            <input type="text" [(ngModel)]="targetName">
+                            <input type="text" [(ngModel)]="altName">
+                            <input type="text" [(ngModel)]="dobEntry">
                             <input type="text" [(ngModel)]="role">
                         </div>
                         <div class="column">
@@ -47,7 +47,7 @@
                             <button class="image">Upload Image</button>
                         </div>
                         <div class="column">
-                            <button (click)="createPerson()">Submit</button>
+                            <button [disabled]="submitStatus" (click)="createPerson()">Submit</button>
                         </div>
                     </div>
                 </div>
@@ -69,8 +69,8 @@
                     <label>Access:</label>
                 </div>
                 <div class="column">
-                    <input type="text" [(ngModel)]="target_name">
-                    <input type="text" [(ngModel)]="alt_name">
+                    <input type="text" [(ngModel)]="targetName">
+                    <input type="text" [(ngModel)]="altName">
                     <select [(ngModel)]="access">
                         <option>private</option>
                         <option>public</option>
@@ -81,7 +81,7 @@
                     <button class="image">Upload Image</button>
                 </div>
                 <div class="column">
-                    <button (click)="createLocation()">Submit</button>
+                    <button [disabled]="submitStatus" (click)="createLocation()">Submit</button>
                 </div>
             </div>
         </div>
